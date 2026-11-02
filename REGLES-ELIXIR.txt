@@ -1,0 +1,346 @@
+ÉLIXIR — RÈGLES DÉTAILLÉES
+Version ChadGangGames (cartes personnalisées)
+
+
+1. PRÉSENTATION
+===============
+Chaque joueur est un sorcier qui participe au concours de magie le plus débile du monde.
+BUT : être le PREMIER à avoir lancé TOUS ses sortilèges.
+De 2 à 8 joueurs (le plus amusant : 3 à 8). Une partie dure 30 à 60 minutes.
+
+2. LE MATÉRIEL
+==============
+• 56 SORTILÈGES répartis en 4 niveaux : 16 de niveau 1, 21 de niveau 2, 11 de niveau 3, 8 de niveau 4.
+  Le niveau d'un sort = le nombre d'ingrédients nécessaires pour le lancer (1 à 4).
+• 112 TROUVAILLES (la pioche) :
+    - 64 ingrédients (16 ingrédients différents, 4 exemplaires de chacun),
+    - 39 objets (magiques ou inutiles),
+    - 9 transactions (3 Jour de marché, 3 Brocante, 3 Ventes aux enchères).
+Les sortilèges sont triés en 4 piles (une par niveau) ; la pioche de trouvailles est mélangée. Quand la pioche est vide, la défausse est remélangée automatiquement.
+
+3. PRÉPARATION
+==============
+1) Choix des sortilèges : chaque joueur compose sa main de sortilèges en piochant dans la pile de son choix (niveau 1, 2, 3 ou 4).
+   Le total des niveaux doit faire EXACTEMENT le nombre d'ingrédients de la partie : 7 (courte), 9 (normale) ou 13 (longue), choisi par l'hôte.
+   Exemple (partie à 9) : un 4 + un 3 + un 2, ou neuf sorts de niveau 1, ou 3+3+3...
+   Peu de gros sorts = puissants mais durs à lancer. Beaucoup de petits = faciles à lancer mais moins percutants.
+   Si plus aucune pile ne permet de compléter ton total, tu es automatiquement prêt. Le bouton « Compléter au hasard » termine ta main pour toi.
+2) Chaque joueur reçoit 5 trouvailles.
+3) Le premier joueur est tiré au hasard. L'ordre de jeu suit l'ordre d'arrivée dans la salle (le « voisin de gauche » est le joueur suivant dans cet ordre).
+
+4. DÉROULEMENT D'UN TOUR
+========================
+1) Tu PIOCHES automatiquement une trouvaille au début de ton tour.
+2) Tu peux ensuite faire autant d'actions que tu veux, dans l'ordre que tu veux :
+   • lancer un sortilège,
+   • jouer un objet,
+   • jouer une transaction.
+3) Tu cliques sur « Fin du tour ».
+Pour jouer une carte : touche-la pour voir son effet, puis « Lancer » (sort) ou « Jouer » (objet / transaction).
+Pendant qu'une action est en cours (réaction d'un joueur, choix collectif…), personne ne peut lancer de carte : il faut attendre la résolution.
+VICTOIRE : dès que ta main de sortilèges est vide (une fois toutes les réactions résolues), tu gagnes immédiatement, même si ce n'est pas ton tour.
+
+5. LANCER UN SORTILÈGE
+======================
+• Pour lancer un sort, tu défausses les ingrédients dessinés sur la carte (un exemplaire par pictogramme). Le sort est ensuite posé face visible devant toi et son effet s'applique.
+• La BAGUETTE MAGIQUE remplace UN ingrédient manquant (elle est défaussée automatiquement).
+• Les ingrédients qui t'ont servi sont perdus ; tes sortilèges déjà lancés restent devant toi.
+• Si tu es réduit au SILENCE (sort « Silence »), tu ne peux lancer aucun sort pendant ton prochain tour.
+• Certains sorts demandent des choix : une victime, un ingrédient, des cartes de ta main, un autre sortilège... Une fenêtre te guide pas à pas.
+• Le sort « Celui qui dit qui est » (Miroir) ne se lance PAS pendant ton tour : il se lance uniquement en réaction (voir §6).
+
+6. QUAND UN SORT TE VISE : LES RÉACTIONS
+========================================
+Quand un joueur lance un sort hostile contre toi (gage, vol, etc.), une fenêtre s'ouvre pour toi. Tu as 25 secondes (sinon tu subis). Tu peux :
+  😬 SUBIR : le sort s'applique normalement.
+  💸 TE RACHETER : tu donnes 2 trouvailles de ton choix (ou toute ta main si tu en as moins) au lanceur. Le sort est annulé (mais il compte quand même comme lancé pour son auteur).
+  🧿 CREUSET DE MIKAËL : si tu as cette carte objet en main, tu la défausses et le sort est annulé.
+  🪞 CELUI QUI DIT QUI EST (Miroir) : si tu l'as dans ta main de sortilèges ET les 3 ingrédients, tu le lances : le sort est renvoyé contre son lanceur, comme si c'était toi qui l'avais lancé. Ce Miroir compte comme un de tes sortilèges lancés (tu te rapproches de la victoire !).
+Protections automatiques (aucune réaction nécessaire) :
+  🛡️ PROTECTION (sort) : annule l'effet du prochain sort de niveau 1 ou 2 que tu subis (une seule fois).
+  🧱 MUR DE VENT (sort niveau 4) : plus aucun sort de niveau 1 ou 2 ne peut te viser pour toute la partie.
+  📵 BOUCLIER NOIR (objet) : aucun sort ne peut te viser jusqu'à ton prochain tour.
+  🔒 CADENAT / PEIGNOIR D'ÉTÉ (objets) : tu ne peux perdre aucune trouvaille jusqu'à ton prochain tour (vols, défausses forcées, redistributions... tu es ignoré).
+Les joueurs protégés apparaissent grisés dans la liste des cibles.
+
+7. LES GAGES (sorts de niveau 1 et quelques autres)
+===================================================
+La plupart des sorts de niveau 1 imposent un GAGE à un joueur : une contrainte à respecter (finir ses phrases par un bruit, parler en rimes, appeler le lanceur « Maître »...). Le gage reste actif jusqu'à ce qu'il soit levé.
+• LA FAUTE : si le joueur gagé oublie son gage, le LANCEUR du gage appuie sur « 🚨 Faute » et lui prend une trouvaille au hasard. C'est à l'honneur et à la vigilance de chacun !
+• Les gages affichés en rouge sont ceux qui te concernent.
+• Les « missions » (Vérité ou Vérité, Pied, Suceur, FDP, Nomade) sont des gages ponctuels : le lanceur appuie sur « ✔ Fait » quand c'est accompli.
+• Le gage « Muet » prend fin au début du prochain tour de sa victime.
+• Le sort « Votre » (niveau 2) est un gage sur TOUT LE MONDE : chacun doit vouvoyer et appeler le lanceur « Votre Excellence ». Le lanceur désigne le fautif.
+• Comment lever un gage : sort « Ressort » (tous les gages), objet « Purge » (un gage de niveau 1 sur toi), sort « Transfert » (le refiler à quelqu'un), ou le renvoyer avec un Miroir.
+
+8. LES TRANSACTIONS
+===================
+Une transaction se joue pendant ton tour comme n'importe quelle carte.
+• JOUR DE MARCHÉ : chaque joueur (ayant des cartes) choisit une trouvaille en secret ; elles passent toutes au joueur de gauche (chacun reçoit celle de son voisin de droite).
+• BROCANTE : chaque joueur défausse autant de trouvailles qu'il veut (même zéro) et repioche autant de cartes.
+• VENTES AUX ENCHÈRES : on retourne autant de trouvailles que de joueurs. En commençant par celui qui a joué la carte, puis dans l'ordre du jeu, chacun prend une carte. L'objet « Passe-droit » permet de choisir en premier.
+• TAXE : si quelqu'un a lancé « Taxe », chaque transaction déclenche d'abord un versement : tous les autres joueurs donnent une trouvaille au détenteur de la Taxe.
+Délais : chaque choix collectif a un compte à rebours (30 à 45 s) ; au-delà, un choix au hasard est fait pour les joueurs absents.
+
+9. EFFETS ÉVÉNEMENTS ET ÉTATS
+=============================
+• 💡 LUMIÈRE : pendant 2 tours, les trouvailles piochées et défaussées par les autres joueurs sont affichées dans l'historique (sauf celles du lanceur).
+• 🔔 PINK WARD (Sifflet) : toutes les mains sont visibles jusqu'à la fin de ton tour.
+• ⏳ SABLIER : la cible n'a que 30 secondes à son prochain tour, sinon son tour est terminé de force.
+• 2️⃣ PUISSANCE 2 : le prochain objet magique que tu joues s'applique deux fois.
+• ⏭️ SKIP / CHUT (Édredon) : la cible saute son prochain tour.
+• ⚡ TOURS SUPPLÉMENTAIRES (Priority Q, Une pierre deux coups) : tu rejoues juste après avoir terminé ton tour (une pioche à chaque tour).
+• 💼 RACKET : à chacun de tes tours, tu choisis un joueur et tu lui prends une trouvaille au hasard.
+• ↩️ CONTRESENS : le sens du jeu est inversé.
+
+10. JOUEURS ABSENTS
+===================
+Si un joueur se déconnecte, l'hôte attend environ 8 secondes puis son tour est sauté automatiquement et ses réponses sont tirées au hasard. S'il revient, il reprend sa place. Si l'hôte part, le joueur suivant de la salle devient hôte et la partie continue.
+
+11. CLASSEMENT
+==============
+Chaque victoire est enregistrée dans le classement « all time » du hub (victoires et parties jouées). Seules les parties terminées comptent.
+
+12. CONSEILS TACTIQUES
+======================
+• Garde un œil sur les ingrédients rares pour tes gros sorts : un « Aimant » ou un « Arnaque » peut tout te faire perdre.
+• Les objets inutiles servent de monnaie d'échange pour te racheter sans perdre d'ingrédients utiles.
+• Garde « Creuset de Mikaël » et « Celui qui dit qui est » pour les gros sorts adverses.
+• Un « Cadenat » juste avant la fin de ton tour te protège pendant tout le tour des autres.
+• Les petits sorts sont rapides, mais un seul gros sort bien placé (Reset, Aller Bodycount, Une pierre deux coup) peut retourner la partie.
+
+ANNEXE A — LISTE DES SORTILÈGES
+===============================
+
+Niveau 1  (★)
+--------------------
+• Jan  [Sueur de pieds sales]
+    La cible doit terminer tous les prénoms qu’elle prononce par « jan».
+• Ffffffffffff  [Goutte de cum]
+    La cible doit terminer toutes ses phrases par un bruit de quelqu’un qui tire une taffe
+• Mazel Tov  [Nez de clown]
+    La cible doit commencer chacun de ses tours en disant « Mazel Tov », à chaque fois plus fort que le tour d’avant.
+• Vérité ou Vérité  [Pointe de ragebait]
+    La cible doit répondre honnêtement à une question du lanceur
+• Nomade  [Caca de type 7]
+    Le lanceur peut changer de place avec quelqu’un
+• Lèche-cul  [Cheveux blancs]
+    La cible doit appeler le lanceur « Maître » et lui répondre « Oui mon seigneur »
+• Rimaille  [Herbe à fumer]
+    La cible doit parler en rimes. En cas d'oubli, le lanceur prend une trouvaille au hasard à la cible.
+• Skip  [Fromage de bite]
+    Le prochain tour de la cible est sauté
+• Pied  [Coca sans bulle]
+    La cible doit annoncer sa pointure et deviner celle du lanceur.
+• Pinson  [Absinthe 97,5%]
+    La cible doit chanter tout ce qu'elle dit. En cas d'oubli, le lanceur prend une trouvaille au hasard à la cible.
+• Suave  [Grain de folie]
+    La cible doit prendre une voix plus grave à chaque intervention
+• Suceur  [Barbe de pirate]
+    La cible doit donner 5 qualités du lanceur
+• Joli cœur  [Déodorant 96h]
+    La cible doit faire un compliment à chaque joueur qui lui adresse la parole
+• FDP  [Lait paternel]
+    La cible doit donner un défaut de chaque autre joueur.
+• Écho  [Dose de winner q]
+    La cible doit répéter la dernière phrase de chaque joueur avant de parler. En cas d'oubli, le lanceur prend une trouvaille au hasard à la cible.
+• Muet  [Bave de gooner]
+    Jusqu'à son prochain tour, la cible ne peut communiquer que par écrit
+
+Niveau 2  (★★)
+--------------------
+• Transfert  [Barbe de pirate + Herbe à fumer]
+    Transférez un gage (niveau 1) qui vous affecte vers le joueur de votre choix.
+• Protection  [Bave de gooner + Pointe de ragebait]
+    Vous protège de l'effet du prochain sortilège de niveau 1 ou 2 que vous subissez.
+• Ressort  [Coca sans bulle + Sueur de pieds sales]
+    Tous les joueurs sont libérés des gages de niveau 1 en cours.
+• Tournesort  [Fromage de bite + Nez de clown]
+    Chaque joueur passe un de ses sortilèges non lancés à son voisin de gauche.
+• Braquage  [Dose de winner q + Caca de type 7]
+    Prenez 2 trouvailles au hasard dans la main du joueur de votre choix.
+• Lumière  [Déodorant 96h + Grain de folie]
+    Pendant 2 tours, les trouvailles piochées et défaussées sont visibles sauf les votres
+• Affaires  [Absinthe 97,5% + Goutte de cum]
+    Ouvrez immédiatement un Jour de marché.
+• Générosité  [Lait paternel + Cheveux blancs]
+    Chaque joueur doit vous donner une trouvaille de son choix.
+• Beurk  [Caca de type 7 + Bave de gooner]
+    Le joueur de votre choix défausse tous ses exemplaires d'un même ingrédient (au choix du lanceur).
+• Abracada bric-à-brac  [Barbe de pirate + Grain de folie]
+    Tous les objets en main des joueurs sont rassemblés, mélangés et redistribués.
+• Surprise  [Coca sans bulle + Fromage de bite]
+    Piochez 3 trouvailles.
+• Silence  [Cheveux blancs + Absinthe 97,5%]
+    Le joueur de votre choix ne peut pas lancer de sortilège jusqu'à la fin de son prochain tour.
+• Troc  [Sueur de pieds sales + Lait paternel]
+    Échangez 2 trouvailles de votre choix contre 2 trouvailles prises au hasard chez un joueur.
+• Voleur  [Dose de winner q + Nez de clown]
+    Volez une trouvaille au hasard à chaque adversaire.
+• Contresens  [Déodorant 96h + Herbe à fumer]
+    Le sens du jeu est inversé.
+• Dommage  [Coca sans bulle + Cheveux blancs]
+    Le joueur de votre choix reprend en main un sortilège qu'il a déjà lancé.
+• Cadeau  [Pointe de ragebait + Sueur de pieds sales]
+    Donnez jusqu'à 3 trouvailles de votre main au joueur de votre choix.
+• Razzia  [Goutte de cum + Absinthe 97,5%]
+    Le joueur de votre choix doit vous donner tous ses objets.
+• Votre  [Déodorant 96h + Herbe à fumer]
+    Tous les joueurs doivent vous vouvoyer et vous appeler « Votre Excellence ». En cas d'oubli, vous prenez une trouvaille au fautif.
+• Notre…  [Nez de clown + Bave de gooner]
+    La cible doit parler à la première personne du pluriel (« nous », « notre »).
+• Pickpocket  [Barbe de pirate + Caca de type 7]
+    Regardez la main d'un joueur et prenez-y 2 cartes de votre choix.
+
+Niveau 3  (★★★)
+--------------------
+• Mélange  [Pointe de ragebait + Goutte de cum + Lait paternel]
+    Tous les sortilèges non lancés sont rassemblées, mélangées et redistribuées équitablement.
+• Embrouille  [Fromage de bite + Dose de winner q + Barbe de pirate]
+    Échangez un de vos sortilèges non lancés contre un sortilège de même niveau d'un autre joueur.
+• Duplicata  [Grain de folie + Lait paternel + Dose de winner q]
+    Appliquez à nouveau l'effet du dernier sortilège lancé
+• Celui qui dit qui est  [Goutte de cum + Barbe de pirate + Fromage de bite]
+    À jouer hors de votre tour : le sortilège lancé contre vous frappe son lanceur à votre place.
+• Supertroc  [Coca sans bulle + Sueur de pieds sales + Absinthe 97,5%]
+    Échangez toute votre main avec celle du joueur de votre choix, puis piochez 1 trouvaille.
+• Tourniquet  [Lait paternel + Cheveux blancs + Caca de type 7]
+    Chaque joueur donne toutes ses trouvailles à son voisin de gauche.
+• Tourne et retourne  [Pointe de ragebait + Dose de winner q + Bave de gooner]
+    Toutes les trouvailles de tous les joueurs sont mélangées puis redistribuées une à une.
+• Coup de maître  [Herbe à fumer + Nez de clown + Déodorant 96h]
+    Lancez immédiatement un autre de vos sortilèges avec un ingrédient de moins.
+• Illusion  [Grain de folie + Lait paternel + Sueur de pieds sales]
+    Posez un de vos sortilèges non lancés de niveau 1 ou 2 comme s'il était lancé, sans appliquer son effet.
+• Zzz  [Déodorant 96h + Pointe de ragebait + Absinthe 97,5%]
+    La cible doit raconter une histoire d'au moins 3 minutes sans s'arrêter. Si elle échoue, elle vous donne 3 trouvailles.
+• Racket  [Dose de winner q + Bave de gooner + Grain de folie]
+    Pour le reste de la partie, au début de chacun de vos tours, prenez une trouvaille au hasard au joueur de votre choix.
+
+Niveau 4  (★★★★)
+--------------------
+• Aller Bodycount  [Caca de type 7 + Barbe de pirate + Cheveux blancs + Herbe à fumer]
+    La cible reprend en main tous les sortilèges qu’elle a déjà lancés, défausse toutes ses trouvailles et reçoit 5 nouvelles trouvailles.
+• 1 acheté, 1 offert  [Goutte de cum + Fromage de bite + Nez de clown + Coca sans bulle]
+    Lancez immédiatement un autre de vos sortilèges, sans payer ses ingrédients.
+• Une pierre, deux coup  [Fromage de bite + Dose de winner q + Lait paternel + Sueur de pieds sales]
+    Jouez immédiatement deux tours complets supplémentaires.
+• Taxe  [Pointe de ragebait + Grain de folie + Bave de gooner + Nez de clown]
+    Pour le reste de la partie, lors de chaque transaction, chaque joueur doit vous verser une trouvaille.
+• Reset  [Goutte de cum + Coca sans bulle + Cheveux blancs + Caca de type 7]
+    Tous les joueurs défaussent leur main et piochent 5 nouvelles trouvailles ; vous en piochez 7.
+• En slip  [Herbe à fumer + Déodorant 96h + Absinthe 97,5% + Barbe de pirate]
+    Le joueur de votre choix doit vous donner tous ses ingrédients.
+• Aller pioche enculé  [Goutte de cum + Herbe à fumer + Bave de gooner + Dose de winner q]
+    Le joueur de votre choix pioche un sortilège de niveau 4 supplémentaire qu'il devra aussi lancer.
+• Mur de Vent  [Barbe de pirate + Sueur de pieds sales + Absinthe 97,5% + Déodorant 96h]
+    Pour le reste de la partie, aucun sortilège de niveau 1 ou 2 ne peut vous viser.
+
+ANNEXE B — LISTE DES OBJETS
+===========================
+• Papillotes magiques
+    Volez une trouvaille au hasard dans la main du joueur de votre choix.
+• Pink Ward
+    Tous les joueurs posent leur main face visible sur la table jusqu'à la fin de votre tour.
+• Baguette magique (s'utilise automatiquement)
+    Remplace n'importe quel ingrédient pour lancer un sortilège.
+• Aimant
+    Nommez un ingrédient : chaque joueur qui en possède doit vous en donner un exemplaire.
+• Sac à dos
+    Piochez 3 trouvailles.
+• Transmutateur
+    Échangez un ingrédient de votre main contre l'ingrédient de votre choix pris dans la défausse.
+• Argent haram
+    Objet inutile : aucun effet, mais peut servir de monnaie d'échange en transaction ou être réclamé par certains sortilèges.
+• Torche maudite
+    Objet inutile : aucun effet, mais peut servir de monnaie d'échange en transaction ou être réclamé par certains sortilèges.
+• Corde de pendaison
+    Objet inutile : aucun effet, mais peut servir de monnaie d'échange en transaction ou être réclamé par certains sortilèges
+• Swap
+    Échangez votre main avec celle du joueur de votre choix.
+• Priority Q
+    Jouez immédiatement un tour supplémentaire.
+• Cadenat
+    Jusqu'à votre prochain tour, aucune trouvaille ne peut vous être prise.
+• -1
+    Chaque adversaire défausse une trouvaille de son choix.
+• Fouilleur de poubelle
+    Prenez dans la défausse la trouvaille de votre choix.
+• Philtre d'amour
+    Le joueur de votre choix doit vous donner une trouvaille de son choix.
+• Bouclier noir
+    Jusqu'à votre prochain tour, aucun sortilège ne peut vous viser.
+• Boule de cristal
+    Regardez les 5 premières trouvailles de la pioche et remettez-les dans l'ordre de votre choix.
+• Chut
+    Le joueur de votre choix passe son prochain tour.
+• Ramasse-miettes
+    Récupérez en main les 3 dernières cartes de la défausse.
+• Tapis tournant
+    Chaque joueur passe sa main entière à son voisin de gauche.
+• W vape
+    Objet inutile : aucun effet, mais peut servir de monnaie d'échange en transaction ou être réclamé par certains sortilèges.
+• Poubelle magique
+    Défaussez autant de trouvailles que vous voulez, puis piochez-en autant.
+• Purge
+    Libérez-vous d'un gage (sortilège de niveau 1) qui vous affecte.
+• Creuset de Mikaël (se joue en réaction)
+    À jouer hors de votre tour : le sortilège lancé contre vous est annulé.
+• Puissance 2
+    Le prochain objet magique que vous jouez s'applique deux fois.
+• Café
+    Objet inutile : aucun effet, mais peut servir de monnaie d'échange en transaction ou être réclamé par certains sortilèges.
+• Bouzelouf
+    Objet inutile : aucun effet, mais peut servir de monnaie d'échange en transaction ou être réclamé par certains sortilèges.
+• Cock ring
+    Objet inutile : aucun effet, mais peut servir de monnaie d'échange en transaction ou être réclamé par certains sortilèges.
+• Aspirateur
+    Prenez toute la défausse, gardez-en 2 cartes et placez le reste sous la pioche.
+• Passe-droit (se joue pendant les enchères)
+    À jouer à tout moment : vous agissez en premier lors de la transaction en cours.
+• Chaudron Percé
+    Défaussez 2 trouvailles et piochez-en 3.
+• Chaussures suspectes
+    Objet inutile : aucun effet, mais peut servir de monnaie d'échange en transaction ou être réclamé par certains sortilèges.
+• Boîte à pringles
+    Lancez immédiatement un de vos sortilèges de niveau 1 sans ingrédient.
+• Grimoire
+    Échangez un de vos sortilèges non lancés contre le premier de la pile du même niveau.
+• Sablier
+    Le joueur de votre choix doit jouer son prochain tour en 30 secondes, sinon il passe.
+• Épis de maïs
+    Objet inutile : aucun effet, mais peut servir de monnaie d'échange en transaction ou être réclamé par certains sortilèges.
+• Chaussette à cum
+    Objet inutile : aucun effet, mais peut servir de monnaie d'échange en transaction ou être réclamé par certains sortilèges.
+• Peignoir d'été
+    Vous empêche de perdre des trouvailles pendant 1 tour
+• Lunettes trop petites
+    Regardez la main d'un joueur et prenez-y un ingrédient en échange d'une de vos trouvailles.
+
+ANNEXE C — LES TRANSACTIONS (×3 chacune)
+========================================
+• Jour de marché
+    Chaque joueur choisit une trouvaille en secret : elles passent toutes au joueur de gauche.
+• Brocante
+    Chacun défausse autant de trouvailles qu'il veut (même zéro) puis repioche autant.
+• Ventes aux enchères
+    On retourne autant de trouvailles que de joueurs : en commençant par celui qui a joué la carte, chacun en prend une.
+
+ANNEXE D — LES 16 INGRÉDIENTS (×4 chacun)
+=========================================
+• Barbe de pirate
+• Cheveux blancs
+• Nez de clown
+• Pointe de ragebait
+• Grain de folie
+• Goutte de cum
+• Coca sans bulle
+• Lait paternel
+• Sueur de pieds sales
+• Déodorant 96h
+• Herbe à fumer
+• Dose de winner q
+• Fromage de bite
+• Absinthe 97,5%
+• Caca de type 7
+• Bave de gooner

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Élixir</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Accueil -->
+    <section id="home" class="screen">
+      <div class="logo"><span class="flask">🧪</span><h1>Élixir</h1><p>Le concours de magie le plus débile du monde</p></div>
+      <div class="card-box">
+        <label id="pseudo-row" class="hidden">Ton pseudo<input id="pseudo" maxlength="18" autocomplete="off" placeholder="Apprenti sorcier"></label>
+        <button id="b-create" class="btn big">✨ Créer une salle</button>
+        <div class="or">ou rejoins tes amis</div>
+        <div class="row"><input id="code" maxlength="8" autocomplete="off" placeholder="CODE" style="text-transform:uppercase"><button id="b-join" class="btn">Rejoindre</button></div>
+        <button id="b-rules0" class="btn ghost">❓ Comment jouer</button>
+      </div>
+    </section>
+
+    <!-- Salon d'attente -->
+    <section id="lobby" class="screen hidden"></section>
+
+    <!-- Choix des sortilèges -->
+    <section id="setup" class="screen hidden"></section>
+
+    <!-- Table de jeu -->
+    <section id="table" class="screen hidden"></section>
+  </div>
+
+  <div id="modal" class="hidden"></div>
+  <canvas id="fx"></canvas>
+  <div id="toasts"></div>
+
+  <script src="/_sdk.js"></script>
+  <script src="data.js"></script>
+  <script src="engine.js"></script>
+  <script src="fx.js"></script>
+  <script src="ui.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
