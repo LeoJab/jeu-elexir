@@ -3,7 +3,7 @@
 (function (root) {
   'use strict';
   const D = root.DATA;
-  const N_ING = 64, OBJ0 = 64, TR0 = 103, N_TROUV = 112;
+  const N_ING = 64, OBJ0 = 64, TR0 = 103, N_TROUV = 115, GAGE_MS = 300000;
   const WAND = OBJ0 + D.objects.findIndex(o => o.key === 'baguette');
   const CAPE = OBJ0 + D.objects.findIndex(o => o.key === 'cape');
   const PREUM = OBJ0 + D.objects.findIndex(o => o.key === 'preum');
@@ -50,6 +50,9 @@
     poubelle: { need: ['cards:0-9'] }, bouclier: { need: ['gage'] }, aspirateur: { need: ['disc:2'] }, chaudron: { need: ['cards:2'] },
     chapeau: { need: ['sub1'] }, grimoire: { need: ['spell'] }, sablier: { need: ['player'] }, loupe: { need: ['player'], steal: 1 }
   };
+
+  /* Les gages (sorts à effet continu) durent 5 minutes puis prennent fin tout seuls. */
+  D.spells.forEach(s => { if (META[s.key] && META[s.key].mode === 'gage') { s.dur = 5; if (!/⏱/.test(s.effect)) s.effect += ' ⏱ Dure 5 min.'; } });
 
   /* ---------- Utilitaires ---------- */
   const rand = n => Math.floor(Math.random() * n);
@@ -217,7 +220,7 @@
       if (t.wall && sp.level <= 2) bad(`${t.name} est derrière son Mur de Vent.`);
       if (M.steal && t.lock) bad(`${t.name} est protégé : rien à lui prendre.`);
       if (M.hostile && !o.mirrored) {
-        if (t.shield && sp.level <= 2) { t.shield = 0; log(`🛡️ ${t.name} est protégé : « ${sp.name} » est annulé !`); fx('shield', { id: t.id }); return; }
+        if (t.shield && sp.level <= 2) { t.shield = 0; log(`🛡️ ${t.name} est protégé : « ${sp.name} » est annulé !`); fx('shield', { id: t.id }); fx('counter', { sid: sp.id, by: c.id, on: t.id, how: 'shield' }); return; }
         if (!t.off) { S.q.push({ k: 'react', by: c.id, on: t.id, sid: sp.id, prm, dl: now() + 25000 }); return; }
       }
     }
@@ -226,7 +229,7 @@
   function run(c, t, sp, prm, o) {
     try { effect(c, t, sp, prm || {}, o || {}); } catch (e) { if (!(e instanceof Err)) throw e; log(`« ${sp.name} » reste sans effet (${e.message})`); }
   }
-  function addGage(c, t, sp, mode) { S.gages.push({ i: ++S.gn, sid: sp.id, key: sp.key, by: c.id, on: t ? t.id : '*', mode }); }
+  function addGage(c, t, sp, mode) { S.gages.push({ i: ++S.gn, sid: sp.id, key: sp.key, by: c.id, on: t ? t.id : '*', mode, exp: mode === 'gage' ? now() + GAGE_MS : 0 }); }
 
   function effect(c, t, sp, prm, o) {
     const M = META[sp.key];
@@ -398,13 +401,11 @@
       const tx = P(S.taxe), w = tx ? ring(x => x !== tx && x.hand.length && !x.lock && !x.off).map(x => x.id) : [];
       if (w.length) { log(`💸 Taxe : chacun verse une trouvaille à ${tx.name}.`); S.q.push({ k: 'multi', what: 'give', wait: w, picks: {}, to: tx.id, n: 1, dl: now() + 45000 }); }
     }
-    if (type === 0) S.q.push({ k: 'multi', what: 'marche', wait: ring(x => x.hand.length && !x.lock && !x.off).map(x => x.id), picks: {}, dl: now() + 45000 });
-    else if (type === 1) S.q.push({ k: 'multi', what: 'brocante', wait: ring(x => !x.lock && !x.off).map(x => x.id), picks: {}, dl: now() + 45000 });
-    else {
-      const order = []; let i = S.players.indexOf(p); for (let k = 0; k < S.players.length; k++) { order.push(S.players[i].id); i = nextIdx(i); }
-      const cards = []; for (let k = 0; k < S.players.length; k++) { if (!S.deck.length && S.discard.length) { S.deck = shuffle(S.discard); S.discard = []; } if (S.deck.length) cards.push(S.deck.shift()); }
-      S.q.push({ k: 'enchere', cards, order, i: 0, dl: now() + 30000 });
-    }
+    const base = { by: p.id, dl: now() + 45000 };
+    if (type === 0) S.q.push(Object.assign({ k: 'marche', st: 'offer', to: null, give: [] }, base));
+    else if (type === 1) S.q.push({ k: 'brocante', by: p.id, wait: [], all: [], dl: now() + 60000 });
+    else if (type === 2) S.q.push(Object.assign({ k: 'auction', st: 'lot', lot: [], bid: null }, base));
+    else S.q.push(Object.assign({ k: 'pot', st: 'put', n: 0, pot: [], parts: [], wait: [], order: [], i: 0 }, base));
   }
 
   /* ---------- Pending (réactions et choix collectifs) ---------- */
@@ -415,7 +416,11 @@
       if (pd.what === 'marche' && pd.wait.length < 2) return false;
       if (!pd.wait.length) return false;
     }
-    if (pd.k === 'enchere' && !pd.cards.length) return false;
+    if (pd.k === 'marche' || pd.k === 'auction' || pd.k === 'pot') {
+      const c = P(pd.by);
+      if (!c || c.off || !c.hand.length || !S.players.some(x => x !== c && !x.off && x.hand.length && (pd.k !== 'marche' || !x.lock))) { log('🤷 Personne avec qui faire affaire…'); return false; }
+    }
+    if (pd.k === 'brocante') { pd.wait = S.players.filter(x => !x.off && x.hand.length >= 2).map(x => x.id); pd.all = pd.wait.slice(); if (!pd.wait.length) { log('🛒 Personne n\'a de quoi troquer.'); return false; } }
     S.pend = pd; return true;
   }
   function settle() {
@@ -438,7 +443,10 @@
       case 'take': return ansTake(p, pd, m);
       case 'pickplayer': return ansPickPlayer(p, pd, m);
       case 'story': return ansStory(p, pd, m);
-      case 'enchere': return ansEnchere(p, pd, m);
+      case 'marche': return ansMarche(p, pd, m);
+      case 'brocante': return ansBrocante(p, pd, m);
+      case 'auction': return ansAuction(p, pd, m);
+      case 'pot': return ansPot(p, pd, m);
     }
   }
   function ansReact(p, pd, m) {
@@ -450,11 +458,11 @@
         const k = Math.min(2, p.hand.length), cards = (m.cards || []).filter((x, i, a) => p.hand.includes(x) && a.indexOf(x) === i);
         if (cards.length !== k) bad(`Choisis ${k} trouvaille(s) à donner.`);
         done(); cards.forEach(x => { p.hand.splice(p.hand.indexOf(x), 1); c.hand.push(x); });
-        log(`💸 ${p.name} se rachète : ${k} trouvaille(s) offerte(s) à ${c.name}. « ${sp.name} » est annulé.`); fx('buy', { from: p.id, to: c.id }); break;
+        log(`💸 ${p.name} se rachète : ${k} trouvaille(s) offerte(s) à ${c.name}. « ${sp.name} » est annulé.`); fx('buy', { from: p.id, to: c.id }); fx('counter', { sid: sp.id, by: c.id, on: p.id, how: 'buy' }); break;
       }
       case 'cape': {
         if (!p.hand.includes(CAPE)) bad("Tu n'as pas cette carte."); done(); discardCards(p, [CAPE]);
-        log(`🧿 ${p.name} sort le Creuset de Mikaël : « ${sp.name} » est annulé !`); fx('shield', { id: p.id }); break;
+        log(`🧿 ${p.name} sort le Creuset de Mikaël : « ${sp.name} » est annulé !`); fx('shield', { id: p.id }); fx('counter', { sid: sp.id, by: c.id, on: p.id, how: 'cape' }); break;
       }
       case 'mirror': {
         if (!p.spells.includes(MIRROR.id)) bad("Tu n'as pas le sortilège Miroir.");
@@ -462,7 +470,7 @@
         const pay = payPlan(p, MIRROR.ing); if (!pay) bad('Il te manque des ingrédients pour le Miroir.');
         done(); for (const x of pay) { p.hand.splice(p.hand.indexOf(x), 1); S.discard.push(x); }
         p.spells.splice(p.spells.indexOf(MIRROR.id), 1); p.cast.push(MIRROR.id);
-        fx('cast', { sid: MIRROR.id, by: p.id, on: c.id }); log(`🪞 ${p.name} lance « ${MIRROR.name} » : « ${sp.name} » se retourne contre ${c.name} !`);
+        fx('counter', { sid: sp.id, by: c.id, on: p.id, how: 'mirror' }); fx('cast', { sid: MIRROR.id, by: p.id, on: c.id }); log(`🪞 ${p.name} lance « ${MIRROR.name} » : « ${sp.name} » se retourne contre ${c.name} !`);
         run(p, c, sp, pd.prm, { mirrored: 1 }); break;
       }
       default: bad('Réponse inconnue.');
@@ -515,16 +523,101 @@
     if (m.ok) { log(`📖 ${t.name} a tenu 3 minutes sans s'arrêter ! Bravo.`); fx('cheer', { id: t.id }); }
     else { log(`😴 ${t.name} a craqué : 3 trouvailles pour ${p.name} !`); if (t.hand.length && !t.lock) S.q.push({ k: 'multi', what: 'give', wait: [t.id], picks: {}, to: p.id, n: Math.min(3, t.hand.length), dl: now() + 40000 }); }
   }
-  function ansEnchere(p, pd, m) {
-    if (m.pre) {
-      if (!p.hand.includes(PREUM)) bad("Tu n'as pas Passe-droit."); if (pd.order[pd.i] === p.id) bad('Tu es déjà le prochain !');
-      const at = pd.order.indexOf(p.id); if (at < pd.i) bad('Tu as déjà choisi.');
-      discardCards(p, [PREUM]); pd.order.splice(at, 1); pd.order.splice(pd.i, 0, p.id); log(`⏩ ${p.name} grille la politesse avec Passe-droit !`); pd.dl = now() + 30000; return;
+  /* ---------- Transactions (elles se jouent sur la table) ---------- */
+  const mine = (p, cards) => (cards || []).filter((x, i, a) => p.hand.includes(x) && a.indexOf(x) === i);
+  const takeOut = (p, cards) => cards.forEach(x => p.hand.splice(p.hand.indexOf(x), 1));
+
+  function ansMarche(p, pd, m) {
+    const by = P(pd.by);
+    if (pd.st === 'offer') {
+      if (p !== by) bad("Ce n'est pas à toi de proposer.");
+      if (m.a === 'cancel') { done(); log(`🏪 ${p.name} renonce à l'échange.`); return; }
+      const t = P(m.to); if (!t || t === p || t.off) bad('Choisis un autre joueur.');
+      if (t.lock) bad(`${t.name} est protégé : impossible de lui échanger quoi que ce soit.`);
+      const cards = mine(p, m.cards); if (!cards.length) bad('Choisis au moins une trouvaille à proposer.');
+      if (cards.length > t.hand.length) bad(`${t.name} n'a que ${t.hand.length} trouvaille(s).`);
+      takeOut(p, cards); pd.give = cards; pd.to = t.id; pd.st = 'reply'; pd.dl = now() + 45000;
+      log(`🏪 ${p.name} propose à ${t.name} d'échanger ${cards.length} trouvaille(s).`); return;
     }
-    if (pd.order[pd.i] !== p.id) bad("Ce n'est pas encore ton tour de choisir.");
-    const k = m.ci; if (!(k >= 0 && k < pd.cards.length) || pd.cards[k] == null) bad('Carte indisponible.');
-    const c = pd.cards[k]; pd.cards[k] = null; p.hand.push(c); log(`🔨 ${p.name} remporte « ${cname(c)} ».`); pd.i++; pd.dl = now() + 30000;
-    if (pd.i >= pd.order.length || !pd.cards.some(x => x != null)) { S.discard.push(...pd.cards.filter(x => x != null)); done(); }
+    if (p.id !== pd.to) bad("Ce n'est pas à toi de répondre.");
+    if (m.a === 'accept') {
+      const back = mine(p, m.cards); if (back.length !== pd.give.length) bad(`Choisis exactement ${pd.give.length} trouvaille(s) en échange.`);
+      takeOut(p, back); p.hand.push(...pd.give); by.hand.push(...back);
+      done(); log(`🤝 ${p.name} accepte : ${back.length} trouvaille(s) contre ${back.length} avec ${by.name} !`); fx('swap', { a: by.id, b: p.id, n: back.length }); return;
+    }
+    by.hand.push(...pd.give); done(); log(`🙅 ${p.name} refuse l'échange proposé par ${by.name}.`);
+  }
+
+  function ansBrocante(p, pd, m) {
+    if (!pd.wait.includes(p.id)) bad("Tu as déjà terminé.");
+    if (m.a === 'swap') {
+      const cards = mine(p, m.cards); if (cards.length !== 2) bad('Choisis 2 trouvailles à défausser.');
+      if (!S.deck.length && !S.discard.length) bad('Il ne reste aucune carte à piocher.');
+      draw(p, 1); discardCards(p, cards); lumNote(p, 'défausse', cards); log(`🛒 ${p.name} troque 2 trouvailles contre 1.`); fx('swap1', { id: p.id });
+      if (p.hand.length < 2) pd.wait = pd.wait.filter(x => x !== p.id);
+    } else if (m.a === 'done') pd.wait = pd.wait.filter(x => x !== p.id);
+    else bad('Action inconnue.');
+    if (!pd.wait.length) { done(); log('🛒 La brocante est terminée.'); }
+  }
+
+  function endAuction(pd) {
+    const by = P(pd.by); done();
+    if (pd.bid) {
+      const w = P(pd.bid.by), pay = pd.bid.cards.filter(x => w.hand.includes(x)); takeOut(w, pay); by.hand.push(...pay); w.hand.push(...pd.lot);
+      log(`🔨 Adjugé ! ${w.name} remporte le lot (${pd.lot.map(cname).join(', ')}) contre ${pay.length} trouvaille(s) pour ${by.name}.`); fx('swap', { a: by.id, b: w.id, n: pay.length });
+    } else { by.hand.push(...pd.lot); log(`🔨 Personne n'enchérit : ${by.name} récupère son lot.`); }
+  }
+  const bidOf = b => b ? b.cards.length + (b.bonus || 0) : 0;
+  function ansAuction(p, pd, m) {
+    const by = P(pd.by);
+    if (pd.st === 'lot') {
+      if (p !== by) bad("Ce n'est pas à toi de choisir le lot.");
+      if (m.a === 'cancel') { done(); log(`🔨 ${p.name} renonce aux enchères.`); return; }
+      const cards = mine(p, m.cards); if (cards.length < 1 || cards.length > 3) bad('Choisis de 1 à 3 trouvailles à mettre aux enchères.');
+      takeOut(p, cards); pd.lot = cards; pd.st = 'bid'; pd.dl = now() + 30000; pd.t0 = now();
+      log(`🔨 ${p.name} met aux enchères : ${cards.map(cname).join(', ')} ! (30 s)`); return;
+    }
+    if (m.a === 'end') { if (p !== by) bad('Seul le lanceur peut conclure.'); return endAuction(pd); }
+    if (m.pre) {
+      if (!p.hand.includes(PREUM)) bad("Tu n'as pas Passe-droit.");
+      if (!pd.bid || pd.bid.by !== p.id) bad('Joue-le sur ta propre offre.');
+      if (pd.bid.cards.includes(PREUM)) bad('Passe-droit fait partie de ton offre.');
+      discardCards(p, [PREUM]); pd.bid.bonus = (pd.bid.bonus || 0) + 1; log(`⏩ ${p.name} joue Passe-droit : son offre compte pour une trouvaille de plus !`); fx('obj', { cid: PREUM, by: p.id }); return;
+    }
+    if (p === by) bad('Tu ne peux pas enchérir sur ton propre lot.');
+    const cards = mine(p, m.cards); if (!cards.length) bad('Choisis des trouvailles à offrir.');
+    const cur = bidOf(pd.bid); if (cards.length <= cur) bad(cur ? `Il faut offrir plus de ${cur} trouvaille(s).` : 'Offre au moins une trouvaille.');
+    pd.bid = { by: p.id, cards, bonus: 0 }; log(`💰 ${p.name} enchérit : ${cards.length} trouvaille(s) !`); fx('bid', { id: p.id, n: cards.length });
+  }
+
+  function startDraft(pd) {
+    if (pd.parts.length < 2) { P(pd.by).hand.push(...pd.pot); done(); log('🍲 Personne ne rejoint le pot : il est rendu.'); return; }
+    pd.pot = shuffle(pd.pot); const order = []; let i = S.players.indexOf(P(pd.by));
+    for (let k = 0; k < S.players.length; k++) { const x = S.players[i]; if (pd.parts.includes(x.id)) order.push(x.id); i = nextIdx(i); }
+    pd.order = order; pd.i = 0; pd.st = 'draft'; pd.dl = now() + 25000; log('🍲 Le pot est mélangé et révélé : on se sert !'); fx('boom');
+  }
+  function ansPot(p, pd, m) {
+    const by = P(pd.by);
+    if (pd.st === 'put') {
+      if (p !== by) bad("Ce n'est pas à toi de remplir le pot.");
+      if (m.a === 'cancel') { done(); log(`🍲 ${p.name} renonce au pot commun.`); return; }
+      const cards = mine(p, m.cards); if (!cards.length) bad('Choisis au moins une trouvaille pour le pot.');
+      const others = ring(x => x !== p && !x.off && x.hand.length >= cards.length); if (!others.length) bad("Personne n'a assez de trouvailles pour te suivre : mets-en moins.");
+      takeOut(p, cards); pd.pot = cards.slice(); pd.n = cards.length; pd.parts = [p.id]; pd.wait = others.map(x => x.id); pd.st = 'join'; pd.dl = now() + 30000;
+      log(`🍲 ${p.name} met ${pd.n} trouvaille(s) dans le pot commun. Qui en est ?`); return;
+    }
+    if (pd.st === 'join') {
+      if (!pd.wait.includes(p.id)) bad("Tu n'as rien à faire ici.");
+      if (m.a === 'join') {
+        const cards = mine(p, m.cards); if (cards.length !== pd.n) bad(`Mets exactement ${pd.n} trouvaille(s) dans le pot.`);
+        takeOut(p, cards); pd.pot.push(...cards); pd.parts.push(p.id); log(`🍲 ${p.name} rejoint le pot !`);
+      } else log(`🍲 ${p.name} passe son tour.`);
+      pd.wait = pd.wait.filter(x => x !== p.id); if (!pd.wait.length) startDraft(pd); return;
+    }
+    if (p.id !== pd.order[pd.i % pd.order.length]) bad("Ce n'est pas encore ton tour de choisir.");
+    const k = m.ci; if (!(k >= 0 && k < pd.pot.length)) bad('Carte indisponible.');
+    const c = pd.pot.splice(k, 1)[0]; p.hand.push(c); log(`🍲 ${p.name} prend « ${cname(c)} ».`); fx('draw1', { id: p.id }); pd.i++; pd.dl = now() + 25000;
+    if (!pd.pot.length) { done(); log('🍲 Le pot commun est vidé !'); }
   }
 
   /* ---------- Fautes et missions ---------- */
@@ -585,20 +678,39 @@
       case 'take': { const f = P(pd.from), pool = f.hand.filter(x => !pd.ing || isIng(x)); return { t: 'ans', cards: shuffle(pool.slice()).slice(0, pd.n), mine: pd.give ? [r()] : [] }; }
       case 'pickplayer': { const o = S.players.filter(x => x !== p && x.hand.length); return { t: 'ans', pl: (o[rand(o.length)] || S.players.find(x => x !== p)).id }; }
       case 'story': return { t: 'ans', ok: true };
-      case 'enchere': return { t: 'ans', ci: pd.cards.findIndex(x => x != null) };
+      case 'marche': return { t: 'ans', a: pd.st === 'offer' ? 'cancel' : 'no' };
+      case 'auction': return { t: 'ans', a: 'cancel' };
+      case 'pot': return pd.st === 'put' ? { t: 'ans', a: 'cancel' } : pd.st === 'join' ? { t: 'ans', a: 'no' } : { t: 'ans', ci: 0 };
     }
   }
+  const waiters = pd => {
+    switch (pd.k) {
+      case 'react': return [pd.on];
+      case 'multi': case 'brocante': return pd.wait;
+      case 'auction': return pd.st === 'lot' ? [pd.by] : [];
+      case 'marche': return [pd.st === 'offer' ? pd.by : pd.to];
+      case 'pot': return pd.st === 'join' ? pd.wait : pd.st === 'put' ? [pd.by] : [pd.order[pd.i % pd.order.length]];
+      default: return [pd.who || pd.by];
+    }
+  };
   function autoResolve(pd) {
-    const who = pd.k === 'react' ? [pd.on] : pd.k === 'multi' ? pd.wait.slice() : pd.k === 'enchere' ? [pd.order[pd.i]] : [pd.who || pd.by];
+    if (pd.k === 'brocante') { done(); log('🛒 La brocante est terminée (temps écoulé).'); return; }
+    if (pd.k === 'auction' && pd.st === 'bid') { endAuction(pd); return; }
+    const who = waiters(pd).slice();
     for (const id of who) { if (S.pend !== pd) break; const p = P(id); if (!p) continue; try { answer(p, autoMsg(pd, p)); } catch (e) { if (!(e instanceof Err)) throw e; if (S.pend === pd) { if (pd.k === 'react') { done(); } else if (pd.k === 'multi') { pd.wait = pd.wait.filter(x => x !== id); if (!pd.wait.length) { done(); resolveMulti(pd); } } else done(); } } }
   }
   function tick(state, t) {
     let changed = false;
     const r = guarded(state, () => {
       const pd = S.pend;
+      const gone = S.gages.filter(g => g.exp && t > g.exp);
+      if (gone.length) {
+        S.gages = S.gages.filter(g => !gone.includes(g)); changed = true;
+        gone.forEach(g => { const v = g.on === '*' ? null : P(g.on); log(`⌛ « ${D.spells[g.sid].name} » prend fin${v ? ' pour ' + v.name : ''}.`); fx('gageEnd', { sid: g.sid, on: g.on }); });
+      }
       if (S.phase === 'setup') { S.players.forEach(p => { if (p.off && !ready(p)) { autoSpells(p); changed = true; } }); }
       if (pd) {
-        const waiting = pd.k === 'react' ? [pd.on] : pd.k === 'multi' ? pd.wait : pd.k === 'enchere' ? [pd.order[pd.i]] : [pd.who || pd.by];
+        const waiting = waiters(pd);
         const onlyOff = waiting.length && waiting.every(id => { const p = P(id); return p && p.off; });
         if ((pd.dl && t > pd.dl) || onlyOff) { autoResolve(pd); changed = true; }
       } else if (S.phase === 'play') {

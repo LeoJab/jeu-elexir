@@ -12,10 +12,11 @@ De 2 à 8 joueurs (le plus amusant : 3 à 8). Une partie dure 30 à 60 minutes.
 ==============
 • 56 SORTILÈGES répartis en 4 niveaux : 16 de niveau 1, 21 de niveau 2, 11 de niveau 3, 8 de niveau 4.
   Le niveau d'un sort = le nombre d'ingrédients nécessaires pour le lancer (1 à 4).
-• 112 TROUVAILLES (la pioche) :
+• 115 TROUVAILLES (la pioche) :
     - 64 ingrédients (16 ingrédients différents, 4 exemplaires de chacun),
     - 39 objets (magiques ou inutiles),
-    - 9 transactions (3 Jour de marché, 3 Brocante, 3 Ventes aux enchères).
+    - 12 transactions (3 Jour de marché, 3 Brocante, 3 Ventes aux enchères, 3 Pot commun).
+• Coin en haut à droite de chaque carte : JAUNE = ingrédient, BLEU = objet utile, ROUGE = objet inutile, VIOLET = transaction, ORANGE = sortilège (avec son niveau). Ta main est triée par type pour que tu voies ces coins.
 Les sortilèges sont triés en 4 piles (une par niveau) ; la pioche de trouvailles est mélangée. Quand la pioche est vide, la défausse est remélangée automatiquement.
 
 3. PRÉPARATION
@@ -66,6 +67,7 @@ Les joueurs protégés apparaissent grisés dans la liste des cibles.
 7. LES GAGES (sorts de niveau 1 et quelques autres)
 ===================================================
 La plupart des sorts de niveau 1 imposent un GAGE à un joueur : une contrainte à respecter (finir ses phrases par un bruit, parler en rimes, appeler le lanceur « Maître »...). Le gage reste actif jusqu'à ce qu'il soit levé.
+• DURÉE : un gage (sort à effet continu) dure 5 MINUTES. Le chrono est affiché dans « Sorts en cours » ; au bout de 5 min, le gage prend fin tout seul (animation « FIN »). Les missions ponctuelles (Vérité ou Vérité, Pied, Suceur, FDP, Nomade) n'ont pas de chrono : le lanceur appuie sur « Fait ».
 • LA FAUTE : si le joueur gagé oublie son gage, le LANCEUR du gage appuie sur « 🚨 Faute » et lui prend une trouvaille au hasard. C'est à l'honneur et à la vigilance de chacun !
 • Les gages affichés en rouge sont ceux qui te concernent.
 • Les « missions » (Vérité ou Vérité, Pied, Suceur, FDP, Nomade) sont des gages ponctuels : le lanceur appuie sur « ✔ Fait » quand c'est accompli.
@@ -75,12 +77,13 @@ La plupart des sorts de niveau 1 imposent un GAGE à un joueur : une contrainte 
 
 8. LES TRANSACTIONS
 ===================
-Une transaction se joue pendant ton tour comme n'importe quelle carte.
-• JOUR DE MARCHÉ : chaque joueur (ayant des cartes) choisit une trouvaille en secret ; elles passent toutes au joueur de gauche (chacun reçoit celle de son voisin de droite).
-• BROCANTE : chaque joueur défausse autant de trouvailles qu'il veut (même zéro) et repioche autant de cartes.
-• VENTES AUX ENCHÈRES : on retourne autant de trouvailles que de joueurs. En commençant par celui qui a joué la carte, puis dans l'ordre du jeu, chacun prend une carte. L'objet « Passe-droit » permet de choisir en premier.
+Une transaction se joue pendant ton tour comme n'importe quelle carte. Au moment où elle est jouée, la TABLE DE JEU s'agrandit : la transaction se déroule sur la table (cartes au centre), et tu sélectionnes tes cartes dans ta main puis tu valides avec les boutons de la table.
+• JOUR DE MARCHÉ : le lanceur propose d'échanger autant de trouvailles qu'il veut contre autant de trouvailles d'un autre joueur. Il touche le joueur visé, sélectionne les cartes qu'il propose (elles sont montrées sur la table), puis le joueur visé choisit ACCEPTER (il donne en échange le même nombre de trouvailles de son choix) ou REFUSER. Un joueur protégé par un Cadenat/Peignoir ne peut pas être visé.
+• BROCANTE : chaque joueur est libre de défausser 2 trouvailles contre 1 de la pioche, autant de fois qu'il le veut (ça se passe en même temps pour tout le monde). Chacun clique sur « J'ai fini » quand il a terminé ; la brocante se termine quand tous ont fini ou au bout de 60 secondes.
+• VENTES AUX ENCHÈRES : le lanceur met aux enchères jusqu'à 3 trouvailles (le lot est visible sur la table). Les autres joueurs surenchérissent en NOMBRE de trouvailles (il faut toujours offrir plus que la meilleure offre en cours ; on choisit les cartes offertes). Au bout de 30 secondes (ou si le lanceur clique sur « Adjuger maintenant »), les enchères prennent fin : le plus offrant remporte le lot et donne ses trouvailles offertes au lanceur. Sans offre, le lanceur garde son lot. L'objet « Passe-droit » se joue sur sa propre offre : elle compte pour une trouvaille de plus.
+• POT COMMUN : le lanceur choisit combien de trouvailles il met dans le pot (au moins 1). Chacun des autres joueurs peut alors décider de rejoindre le pot en y mettant autant de trouvailles que le lanceur (ou de passer). Ensuite, le pot est mélangé et les trouvailles sont visibles : chacun leur tour, les joueurs qui ont participé choisissent la trouvaille qu'ils veulent, en commençant par le lanceur, jusqu'à vider le pot. Si personne ne rejoint, le lanceur récupère ses cartes.
 • TAXE : si quelqu'un a lancé « Taxe », chaque transaction déclenche d'abord un versement : tous les autres joueurs donnent une trouvaille au détenteur de la Taxe.
-Délais : chaque choix collectif a un compte à rebours (30 à 45 s) ; au-delà, un choix au hasard est fait pour les joueurs absents.
+Délais : chaque étape a un compte à rebours (25 à 60 s) ; au-delà, un choix automatique est fait (refus, abandon, ou premier choix) pour les joueurs absents ou trop lents.
 
 9. EFFETS ÉVÉNEMENTS ET ÉTATS
 =============================
@@ -109,43 +112,52 @@ Chaque victoire est enregistrée dans le classement « all time » du hub (victo
 • Un « Cadenat » juste avant la fin de ton tour te protège pendant tout le tour des autres.
 • Les petits sorts sont rapides, mais un seul gros sort bien placé (Reset, Aller Bodycount, Une pierre deux coup) peut retourner la partie.
 
+13. L'ÉCRAN DE JEU
+==================
+• TABLE DE JEU : les joueurs sont assis autour de la table (toi en bas). La pioche et la défausse sont au centre. Chaque siège indique : le nom, le nombre de trouvailles (🃏), le nombre de sortilèges restants (📜) et les points restants (⭐ = ingrédients qu'il reste à payer pour lancer tous ses sorts).
+• BOULETS : chaque sort subi par un joueur accroche un boulet à son siège ; le siège penche de plus en plus et se RETOURNE quand le joueur subit 3 sorts en même temps.
+• CLASSEMENT : liste des joueurs avec points et sorts restants (le premier est celui à qui il reste le moins de points).
+• SORTS EN COURS : liste des gages actifs avec leur chrono de 5 minutes, et les boutons Faute / Fait pour le lanceur.
+• HISTORIQUE DES COUPS : tout ce qui s'est passé.
+• ANIMATIONS : une carte est montrée à l'écran quand un sort est lancé, quand il est contré (Creuset, Miroir, rachat, protection), quand il prend fin, et quand un objet ou une transaction est joué.
+
 ANNEXE A — LISTE DES SORTILÈGES
 ===============================
 
 Niveau 1  (★)
 --------------------
 • Jan  [Sueur de pieds sales]
-    La cible doit terminer tous les prénoms qu’elle prononce par « jan».
+    La cible doit terminer tous les prénoms qu’elle prononce par « jan». ⏱ Dure 5 min.
 • Ffffffffffff  [Goutte de cum]
-    La cible doit terminer toutes ses phrases par un bruit de quelqu’un qui tire une taffe
+    La cible doit terminer toutes ses phrases par un bruit de quelqu’un qui tire une taffe ⏱ Dure 5 min.
 • Mazel Tov  [Nez de clown]
-    La cible doit commencer chacun de ses tours en disant « Mazel Tov », à chaque fois plus fort que le tour d’avant.
+    La cible doit commencer chacun de ses tours en disant « Mazel Tov », à chaque fois plus fort que le tour d’avant. ⏱ Dure 5 min.
 • Vérité ou Vérité  [Pointe de ragebait]
     La cible doit répondre honnêtement à une question du lanceur
 • Nomade  [Caca de type 7]
     Le lanceur peut changer de place avec quelqu’un
 • Lèche-cul  [Cheveux blancs]
-    La cible doit appeler le lanceur « Maître » et lui répondre « Oui mon seigneur »
+    La cible doit appeler le lanceur « Maître » et lui répondre « Oui mon seigneur » ⏱ Dure 5 min.
 • Rimaille  [Herbe à fumer]
-    La cible doit parler en rimes. En cas d'oubli, le lanceur prend une trouvaille au hasard à la cible.
+    La cible doit parler en rimes. En cas d'oubli, le lanceur prend une trouvaille au hasard à la cible. ⏱ Dure 5 min.
 • Skip  [Fromage de bite]
     Le prochain tour de la cible est sauté
 • Pied  [Coca sans bulle]
     La cible doit annoncer sa pointure et deviner celle du lanceur.
 • Pinson  [Absinthe 97,5%]
-    La cible doit chanter tout ce qu'elle dit. En cas d'oubli, le lanceur prend une trouvaille au hasard à la cible.
+    La cible doit chanter tout ce qu'elle dit. En cas d'oubli, le lanceur prend une trouvaille au hasard à la cible. ⏱ Dure 5 min.
 • Suave  [Grain de folie]
-    La cible doit prendre une voix plus grave à chaque intervention
+    La cible doit prendre une voix plus grave à chaque intervention ⏱ Dure 5 min.
 • Suceur  [Barbe de pirate]
     La cible doit donner 5 qualités du lanceur
 • Joli cœur  [Déodorant 96h]
-    La cible doit faire un compliment à chaque joueur qui lui adresse la parole
+    La cible doit faire un compliment à chaque joueur qui lui adresse la parole ⏱ Dure 5 min.
 • FDP  [Lait paternel]
     La cible doit donner un défaut de chaque autre joueur.
 • Écho  [Dose de winner q]
-    La cible doit répéter la dernière phrase de chaque joueur avant de parler. En cas d'oubli, le lanceur prend une trouvaille au hasard à la cible.
+    La cible doit répéter la dernière phrase de chaque joueur avant de parler. En cas d'oubli, le lanceur prend une trouvaille au hasard à la cible. ⏱ Dure 5 min.
 • Muet  [Bave de gooner]
-    Jusqu'à son prochain tour, la cible ne peut communiquer que par écrit
+    Jusqu'à son prochain tour, la cible ne peut communiquer que par écrit ⏱ Dure 5 min.
 
 Niveau 2  (★★)
 --------------------
@@ -186,9 +198,9 @@ Niveau 2  (★★)
 • Razzia  [Goutte de cum + Absinthe 97,5%]
     Le joueur de votre choix doit vous donner tous ses objets.
 • Votre  [Déodorant 96h + Herbe à fumer]
-    Tous les joueurs doivent vous vouvoyer et vous appeler « Votre Excellence ». En cas d'oubli, vous prenez une trouvaille au fautif.
+    Tous les joueurs doivent vous vouvoyer et vous appeler « Votre Excellence ». En cas d'oubli, vous prenez une trouvaille au fautif. ⏱ Dure 5 min.
 • Notre…  [Nez de clown + Bave de gooner]
-    La cible doit parler à la première personne du pluriel (« nous », « notre »).
+    La cible doit parler à la première personne du pluriel (« nous », « notre »). ⏱ Dure 5 min.
 • Pickpocket  [Barbe de pirate + Caca de type 7]
     Regardez la main d'un joueur et prenez-y 2 cartes de votre choix.
 
@@ -297,7 +309,7 @@ ANNEXE B — LISTE DES OBJETS
 • Aspirateur
     Prenez toute la défausse, gardez-en 2 cartes et placez le reste sous la pioche.
 • Passe-droit (se joue pendant les enchères)
-    À jouer à tout moment : vous agissez en premier lors de la transaction en cours.
+    À jouer pendant une vente aux enchères, sur ta propre offre : elle compte pour une trouvaille de plus.
 • Chaudron Percé
     Défaussez 2 trouvailles et piochez-en 3.
 • Chaussures suspectes
@@ -320,11 +332,13 @@ ANNEXE B — LISTE DES OBJETS
 ANNEXE C — LES TRANSACTIONS (×3 chacune)
 ========================================
 • Jour de marché
-    Chaque joueur choisit une trouvaille en secret : elles passent toutes au joueur de gauche.
+    Propose d'échanger autant de trouvailles que tu veux contre autant de trouvailles d'un autre joueur (il peut refuser).
 • Brocante
-    Chacun défausse autant de trouvailles qu'il veut (même zéro) puis repioche autant.
+    Chaque joueur peut défausser 2 trouvailles contre 1 de la pioche, autant de fois qu'il veut.
 • Ventes aux enchères
-    On retourne autant de trouvailles que de joueurs : en commençant par celui qui a joué la carte, chacun en prend une.
+    Mets jusqu'à 3 trouvailles aux enchères : les autres surenchérissent en nombre de trouvailles. Au bout de 30 secondes, le plus offrant remporte le lot et tes enchérisseurs te paient.
+• Pot commun
+    Mets autant de trouvailles que tu veux dans le pot ; chaque joueur peut le rejoindre en mettant autant. Le pot est mélangé et visible, puis chacun prend une trouvaille à tour de rôle (en commençant par toi) jusqu'à vider le pot.
 
 ANNEXE D — LES 16 INGRÉDIENTS (×4 chacun)
 =========================================

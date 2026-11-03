@@ -134,6 +134,18 @@
     if (sp.level === 4) { burst(x, y, { n: 90, emoji: [sp.emoji, '🔥', '⚡', '✨'], speed: 500 }); bolt('#fff', 6); flash('#fff', 700); shake(true); setTimeout(() => burst(x, y, { n: 60, colors: [lv.c, '#ff4d6d'], speed: 450 }), 500); }
   }
 
-  root.FX = { burst, confetti, fireworks, bolt, flash, shake, floatText, centerOf, cinematic, W: () => W, H: () => H };
+  /* Montre une carte au centre de l'écran, puis l'envoie vers la défausse. */
+  function showCard(html, o) {
+    o = o || {}; const el = document.createElement('div'); el.className = 'cardfly ' + (o.cls || ''); el.innerHTML = html + (o.by ? '<div class="cf-by">' + o.by + '</div>' : '');
+    document.body.appendChild(el); const hold = o.hold || 1300;
+    setTimeout(() => {
+      const d = document.querySelector('[data-act="disc"]'), r = el.getBoundingClientRect();
+      if (d) { const t = d.getBoundingClientRect(); el.style.transform = 'translate(-50%,-50%) translate(' + (t.left + t.width / 2 - (r.left + r.width / 2)) + 'px,' + (t.top + t.height / 2 - (r.top + r.height / 2)) + 'px) scale(.15) rotate(25deg)'; }
+      el.style.opacity = '0';
+    }, hold);
+    setTimeout(() => el.remove(), hold + 700);
+  }
+
+  root.FX = { showCard, burst, confetti, fireworks, bolt, flash, shake, floatText, centerOf, cinematic, W: () => W, H: () => H };
   root.Sfx = Sfx;
 })(window);

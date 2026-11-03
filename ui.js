@@ -31,9 +31,26 @@
   const groupIng = hand => { const g = {}; hand.filter(E.isIng).forEach(c => { const k = E.ingOf(c); (g[k] = g[k] || []).push(c); }); return g; };
 
   /* ---------- Cartes ---------- */
+  const typeOf = c => { const i = E.cardInfo(c); return i.kind === 'ing' ? 'ing' : i.kind === 'tr' ? 'tr' : i.useless ? 'junk' : 'obj'; };
+  const TYPE_LBL = { ing: 'Ingrédient', obj: 'Objet', junk: 'Objet inutile', tr: 'Transaction' };
+  const TYPE_ORD = { ing: 0, obj: 1, junk: 2, tr: 3 };
+  /* Coin en haut à droite : jaune = ingrédient, bleu = objet utile, rouge = objet inutile, violet = transaction, orange = sortilège (niveau). */
   function findCard(c, o) {
-    o = o || {}; const i = E.cardInfo(c);
-    return `<div class="card ${i.kind}${i.useless ? ' junk' : ''}${o.sel ? ' sel' : ''}${o.mini ? ' mini' : ''}" data-cid="${c}" style="--c:${i.color || '#fff'}"><div class="em">${i.emoji}</div><div class="nm">${esc(i.name)}</div>${o.n > 1 ? `<b class="cnt">×${o.n}</b>` : ''}</div>`;
+    o = o || {}; const i = E.cardInfo(c), ty = typeOf(c);
+    return `<div class="card ${i.kind}${i.useless ? ' junk' : ''}${o.sel ? ' sel' : ''}${o.mini ? ' mini' : ''}" data-cid="${c}" style="--c:${i.color || '#fff'}${o.z != null && !o.sel ? ';z-index:' + o.z : ''}"><i class="corner ${ty}" title="${TYPE_LBL[ty]}"></i><div class="em">${i.emoji}</div><div class="nm">${esc(i.name)}</div>${o.n > 1 ? `<b class="cnt">×${o.n}</b>` : ''}</div>`;
+  }
+  /* Grandes cartes (aperçu et animations) : nom, coin de type, image, effet. */
+  function fullCard(c, compact) {
+    const i = E.cardInfo(c), ty = typeOf(c);
+    return `<div class="fcard ${ty}${compact ? ' compact' : ''}"><i class="corner ${ty}"></i><div class="fn">${esc(i.name)}</div><div class="fi">${i.emoji}</div>${compact || i.kind === 'ing' ? '' : `<div class="fe">${esc(i.effect)}</div>`}</div>`;
+  }
+  function fullSpell(sid, compact) {
+    const sp = spellOf(sid);
+    return `<div class="fcard sp lv${sp.level}${compact ? ' compact' : ''}"><i class="corner sp">${sp.level}</i><div class="fn">${esc(sp.name)}</div><div class="fi">${sp.emoji}</div><div class="fing">${sp.ing.map(g => `<span title="${esc(D.ingredients[g].name)}">${D.ingredients[g].emoji}</span>`).join('')}</div>${compact ? '' : `<div class="fe">${esc(sp.effect)}</div>`}</div>`;
+  }
+  function fullTr(t) {
+    const tr = D.transactions[t];
+    return `<div class="fcard tr"><i class="corner tr"></i><div class="fn">${esc(tr.name)}</div><div class="fi">${tr.emoji}</div><div class="fe">${esc(tr.effect)}</div></div>`;
   }
   function chips(sp, hand) {
     const have = {}; (hand || []).forEach(c => { if (E.isIng(c)) { const k = E.ingOf(c); have[k] = (have[k] || 0) + 1; } });
@@ -41,7 +58,7 @@
   }
   function spellCard(sid, o) {
     o = o || {}; const sp = spellOf(sid);
-    return `<div class="spell lv${sp.level}${o.can ? ' can' : ''}${o.sel ? ' sel' : ''}${o.dim ? ' dim' : ''}" data-sid="${sid}"><div class="top"><span>${'★'.repeat(sp.level)}</span><span>${o.tag || ''}</span></div><div class="em">${sp.emoji}</div><div class="nm">${esc(sp.name)}</div><div class="ings">${chips(sp, o.hand)}</div></div>`;
+    return `<div class="spell lv${sp.level}${o.can ? ' can' : ''}${o.sel ? ' sel' : ''}${o.dim ? ' dim' : ''}" data-sid="${sid}"><i class="corner sp">${sp.level}</i><div class="top"><span>${'★'.repeat(sp.level)}</span><span>${o.tag || ''}</span></div><div class="em">${sp.emoji}</div><div class="nm">${esc(sp.name)}</div><div class="ings">${chips(sp, o.hand)}</div></div>`;
   }
 
   /* =====================================================================
@@ -183,8 +200,6 @@
     const to = pd.to ? byId(pd.to) : null;
     switch (pd.what) {
       case 'pass': r = await pick({ title: '🎠 Tournesort', sub: 'Choisis un sortilège à passer à ton voisin de gauche.', items: me.spells.map(s => ({ id: s, html: spellCard(s) })), cancel: false }); if (r) a.sid = r[0]; break;
-      case 'marche': r = await pick({ title: '🏪 Jour de marché', sub: 'Choisis une trouvaille : elle passe au joueur de gauche (tu reçois celle de ton voisin de droite).', items: findItems(me.hand), cancel: false }); if (r) a.cards = r; break;
-      case 'brocante': r = await pick({ title: '🛒 Brocante', sub: 'Choisis les trouvailles à défausser (aucune, c\'est possible) : tu en repiocheras autant.', items: findItems(me.hand), min: 0, max: me.hand.length, cancel: false }); if (r) a.cards = r; break;
       case 'give': { const n = Math.min(pd.n, me.hand.length); r = await pick({ title: `🎁 Donne ${n} trouvaille${n > 1 ? 's' : ''} à ${esc(to ? to.name : '')}`, items: findItems(me.hand), min: n, max: n, cancel: false }); if (r) a.cards = r; break; }
       case 'discard': r = await pick({ title: '❄️ Grêle !', sub: 'Défausse une trouvaille.', items: findItems(me.hand), cancel: false }); if (r) a.cards = r; break;
     }
@@ -244,94 +259,212 @@
     if (S.racket.includes(p.id)) f.push('💼'); if (S.taxe === p.id) f.push('💸'); if (S.lum && S.lum.by === p.id) f.push('💡'); if (S.timer && S.timer.pid === p.id) f.push('⏳');
     return f.join(' ');
   }
-  function oppHTML(p) {
-    const S = App.S, cur = S.players[S.turn] === p && S.phase === 'play';
-    const cast = p.cast.map(sid => `<span class="cb lv${spellOf(sid).level}" data-sid="${sid}">${spellOf(sid).emoji}</span>`).join('');
+  /* Un boulet par sort subi (gages visant le joueur, saut de tour, silence, sablier). */
+  function victims(p) {
+    const S = App.S, v = [];
+    S.gages.forEach(g => { if (g.on === p.id || (g.on === '*' && g.by !== p.id)) v.push(spellOf(g.sid).emoji); });
+    if (p.skip) v.push('⏭️'); if (p.silence) v.push('🔇'); if (p.timed) v.push('⏳');
+    return v;
+  }
+  const fmtT = ms => { const l = Math.max(0, Math.round(ms / 1000)); return Math.floor(l / 60) + ':' + String(l % 60).padStart(2, '0'); };
+  function seatPos(i, n, zoom) {
+    const a = Math.PI / 2 + i * 2 * Math.PI / n, mob = innerWidth < 900, rx = zoom ? (mob ? 38 : 44) : (mob ? 33 : 37), ry = zoom ? 40 : (mob ? 36 : 38);
+    return { x: 50 + rx * Math.cos(a), y: 50 + ry * Math.sin(a) };
+  }
+  function seatHTML(p, i, n, zoom) {
+    const S = App.S, me = seat(), cur = S.players[S.turn] === p && S.phase === 'play', v = victims(p), isMe = me && me.id === p.id;
+    const pos = seatPos(i, n, zoom), dir = pos.x > 55 ? -1 : 1, tilt = dir * (v.length >= 3 ? 24 : v.length === 2 ? 15 : v.length === 1 ? 7 : 0), fl = flagsOf(p);
     const hand = S.reveal ? `<div class="ohand">${p.hand.map(c => E.cardInfo(c).emoji).join('')}</div>` : '';
-    return `<div class="opp${cur ? ' turn' : ''}${p.off ? ' off' : ''}" data-pid="${esc(p.id)}">${avatar(p)}<div><div class="on">${esc(p.name)}</div><div class="oc">🃏${p.hand.length} · 📜${p.spells.length}</div></div><div class="of">${flagsOf(p)}</div>${hand}<div class="ocast">${cast}</div></div>`;
+    const cast = p.cast.length ? `<div class="ocast">${p.cast.map(sid => `<span class="cb lv${spellOf(sid).level}" data-sid="${sid}">${spellOf(sid).emoji}</span>`).join('')}</div>` : '';
+    return `<div class="seat${cur ? ' turn' : ''}${p.off ? ' off' : ''}${isMe ? ' me' : ''}${dir < 0 ? ' bl' : ''}" data-pid="${esc(p.id)}" style="left:${pos.x.toFixed(1)}%;top:${pos.y.toFixed(1)}%"><div class="sbox" style="--tilt:${tilt}deg">
+      <div class="sh">${avatar(p)}<div class="sn">${esc(p.name)}${isMe ? ' ★' : ''}</div></div>
+      <div class="ss"><span title="Trouvailles">🃏${p.hand.length}</span><span title="Sortilèges restants">📜${p.spells.length}</span><span title="Points (ingrédients) restants">⭐${E.spellSum(p)}</span></div>
+      ${fl ? `<div class="sf">${fl}</div>` : ''}${hand}${cast}
+      <div class="balls">${v.map((e, k) => `<span class="ball" style="--k:${k}"><em>${e}</em></span>`).join('')}</div></div></div>`;
   }
   function pendText(pd) {
-    const S = App.S, n = id => { const p = byId(id); return p ? p.name : '?'; };
+    const n = id => { const p = byId(id); return p ? p.name : '?'; };
     switch (pd.k) {
       case 'react': return `⏳ ${n(pd.on)} doit réagir à « ${spellOf(pd.sid).name} »…`;
       case 'multi': return `⏳ En attente de : ${pd.wait.map(n).join(', ')}`;
       case 'take': return `👀 ${n(pd.who)} fouille la main de ${n(pd.from)}…`;
       case 'pickplayer': return `💼 ${n(pd.who)} choisit qui racketter…`;
-      case 'enchere': return `🔨 Enchères : c'est à ${n(pd.order[pd.i])} de choisir`;
       case 'story': return `📖 ${n(pd.on)} raconte une histoire sans s'arrêter !`;
     }
     return '';
   }
-  function gagesHTML() {
-    const S = App.S, me = seat(); if (!S.gages.length) return '';
-    return `<div class="gages">${S.gages.map(g => {
-      const sp = spellOf(g.sid), tgt = g.on === '*' ? null : byId(g.on), by = byId(g.by), mine = me && g.by === me.id, onMe = me && (g.on === me.id || g.on === '*' && g.by !== me.id);
+  function sortsHTML() {
+    const S = App.S, me = seat(), t = Date.now();
+    if (!S.gages.length) return '<div class="empty">Aucun sort en cours.</div>';
+    return S.gages.map(g => {
+      const sp = spellOf(g.sid), tgt = g.on === '*' ? null : byId(g.on), by = byId(g.by), mineC = me && g.by === me.id, onMe = me && (g.on === me.id || g.on === '*' && g.by !== me.id);
       const who = g.on === '*' ? `Tous obéissent à <b>${esc(by.name)}</b>` : `<b>${esc(tgt ? tgt.name : '?')}</b> subit`;
-      return `<div class="gage${onMe ? ' onme' : ''}"><span style="font-size:20px">${sp.emoji}</span><div class="gt">${who} « ${esc(sp.name)} »<br><small>${esc(sp.effect)}</small></div>${mine ? (g.mode === 'once' ? `<button class="btn sm green" data-act="done" data-gi="${g.i}">✔ Fait</button>` : '') + `<button class="btn sm red" data-act="fault" data-gi="${g.i}" data-all="${g.on === '*' ? 1 : 0}">🚨 Faute</button>` : ''}</div>`;
-    }).join('')}</div>`;
+      const btns = mineC ? `<div class="gb">${g.mode === 'once' ? `<button class="btn sm green" data-act="done" data-gi="${g.i}">✔ Fait</button>` : ''}<button class="btn sm red" data-act="fault" data-gi="${g.i}" data-all="${g.on === '*' ? 1 : 0}">🚨 Faute</button></div>` : '';
+      return `<div class="srow${onMe ? ' onme' : ''}"><span class="se">${sp.emoji}</span><div class="st">${who} « ${esc(sp.name)} »<small>${esc(sp.effect)}</small>${btns}</div>${g.exp ? `<span class="tmr" data-exp="${g.exp}">⏱ ${fmtT(g.exp - t)}</span>` : '<span class="tmr">mission</span>'}</div>`;
+    }).join('');
   }
-  function enchereHTML(pd) {
-    const me = seat(), cur = pd.order[pd.i] === (me && me.id), hasP = me && me.hand.includes(E.PREUM) && !cur && pd.order.indexOf(me.id) >= pd.i;
-    return `<div class="banner info">🔨 Ventes aux enchères — ${cur ? 'À TOI de choisir !' : 'à ' + esc(byId(pd.order[pd.i]).name)}</div><div class="encheres">${pd.cards.map((c, i) => c == null ? '' : `<div data-act="enchere" data-ci="${i}" style="opacity:${cur ? 1 : .8}">${findCard(c, { mini: true })}</div>`).join('')}</div>${hasP ? '<button class="btn sm" data-act="preum">⏩ Passe-droit : choisir en premier</button>' : ''}`;
+  function rankHTML() {
+    const S = App.S, me = seat();
+    return S.players.slice().sort((a, b) => E.spellSum(a) - E.spellSum(b) || a.spells.length - b.spells.length).map((p, i) => {
+      const pts = E.spellSum(p), pct = Math.max(0, Math.min(100, (S.target - pts) / S.target * 100));
+      return `<div class="rrow${me && p.id === me.id ? ' me' : ''}" data-pid="${esc(p.id)}"><b>${i + 1}</b>${avatar(p)}<div class="rn"><span>${esc(p.name)}</span><small>📜 ${p.spells.length} sort${p.spells.length > 1 ? 's' : ''} · ⭐ ${pts} pt${pts > 1 ? 's' : ''}</small><div class="rbar"><i style="width:${pct}%"></i></div></div></div>`;
+    }).join('');
   }
   function storyHTML(pd) {
     const me = seat(), t = byId(pd.on), isBy = me && pd.by === me.id, left = Math.max(0, Math.round((pd.end - Date.now()) / 1000));
     return `<div class="banner info">📖 <b>${esc(t.name)}</b> doit raconter une histoire sans s'arrêter ! <b id="story-t">${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}</b>${isBy ? `<div style="display:flex;gap:6px;margin-top:6px"><button class="btn sm green" data-act="story" data-ok="1">✅ Il/elle a tenu</button><button class="btn sm red" data-act="story" data-ok="0">😴 A craqué</button></div>` : ''}</div>`;
   }
+
+  /* ---------- Transactions : elles se jouent sur la table (qui s'agrandit) ---------- */
+  let txSel = [], txTarget = null, txKey = '';
+  const TXK = new Set(['marche', 'brocante', 'auction', 'pot']);
+  const isTx = pd => !!(pd && TXK.has(pd.k));
+  function txSync(pd) {
+    const k = pd ? pd.id + ':' + (pd.st || '') + ':' + (pd.i || 0) : '';
+    if (k !== txKey) { txKey = k; txSel = []; txTarget = null; }
+    const me = seat(); txSel = me ? txSel.filter(c => me.hand.includes(c)) : [];
+  }
+  function txCap(pd) {
+    if (pd.k === 'auction' && pd.st === 'lot') return 3;
+    if (pd.k === 'brocante') return 2;
+    if (pd.k === 'marche' && pd.st === 'reply') return pd.give.length;
+    if (pd.k === 'pot' && pd.st === 'join') return pd.n;
+    return 99;
+  }
+  function txHTML(pd) {
+    const S = App.S, me = seat(), meId = me && me.id, nm = id => esc((byId(id) || {}).name || '?');
+    const cd = pd.dl ? `<span class="cd" data-dl="${pd.dl}">${Math.max(0, Math.round((pd.dl - Date.now()) / 1000))}</span> s` : '';
+    const head = (e, t, sub) => `<div class="txh"><b>${e} ${t}</b>${sub ? `<small>${sub}</small>` : ''}<span class="txc">⏱ ${cd}</span></div>`;
+    const btn = (act, label, ok, cls) => `<button class="btn sm ${cls || ''}${ok ? '' : ' off'}" data-tx="${act}">${label}</button>`;
+    const back = n => Array.from({ length: n }, () => '<div class="card mini back">?</div>').join('');
+    switch (pd.k) {
+      case 'marche': {
+        const by = byId(pd.by);
+        if (pd.st === 'offer') {
+          if (meId !== pd.by) return head('🏪', 'Jour de marché') + `<p>${esc(by.name)} prépare une offre d'échange…</p>`;
+          const t = txTarget && byId(txTarget);
+          return head('🏪', 'Jour de marché', 'à toi de proposer') + `<p>Touche un joueur autour de la table, puis choisis dans ta main les trouvailles à lui proposer.</p><p class="txi">Échange avec : <b>${t ? esc(t.name) : '…'}</b> · ${txSel.length} carte${txSel.length > 1 ? 's' : ''}</p><div class="txb">${btn('m-offer', '🤝 Proposer', t && txSel.length >= 1 && txSel.length <= t.hand.length, 'green')}${btn('cancel', 'Annuler', true, 'ghost')}</div>`;
+        }
+        const t = byId(pd.to), k = pd.give.length;
+        return head('🏪', 'Jour de marché', `${esc(by.name)} ⇄ ${esc(t.name)}`) + `<div class="offer">${pd.give.map(c => findCard(c, { mini: true })).join('')}<span class="arr">⇄</span>${back(k)}</div>` +
+          (meId === pd.to ? `<p><b>${esc(by.name)}</b> te propose ${k} trouvaille${k > 1 ? 's' : ''} : choisis-en ${k} des tiennes en échange.</p><div class="txb">${btn('m-accept', '✅ Accepter', txSel.length === k, 'green')}${btn('m-no', '🙅 Refuser', true, 'red')}</div>` : `<p>${esc(by.name)} propose un échange à <b>${esc(t.name)}</b>…</p>`);
+      }
+      case 'brocante': {
+        const inw = me && pd.wait.includes(me.id);
+        return head('🛒', 'Brocante', '2 trouvailles contre 1 de la pioche') + `<div class="pot"><div class="card mini back">🂠<b>${S.deck.length}</b></div></div><div class="who">${pd.all.map(id => `<span class="${pd.wait.includes(id) ? '' : 'ok'}">${nm(id)} ${pd.wait.includes(id) ? '…' : '✅'}</span>`).join('')}</div>` +
+          (inw ? `<p>Sélectionne 2 trouvailles de ta main et échange-les, autant de fois que tu veux.</p><div class="txb">${btn('b-swap', '🔁 Échanger 2 → 1', txSel.length === 2, 'green')}${btn('b-done', "✔ J'ai fini", true, 'ghost')}</div>` : `<p>${pd.all.includes(meId) ? 'Tu as terminé, patiente…' : 'Les autres joueurs troquent…'}</p>`);
+      }
+      case 'auction': {
+        const by = byId(pd.by), isBy = meId === pd.by;
+        if (pd.st === 'lot') return isBy ? head('🔨', 'Ventes aux enchères', 'choisis ton lot') + `<p>Sélectionne de 1 à 3 trouvailles de ta main à mettre aux enchères.</p><div class="txb">${btn('a-lot', "🔨 Lancer l'enchère", txSel.length >= 1 && txSel.length <= 3, 'green')}${btn('cancel', 'Annuler', true, 'ghost')}</div>` : head('🔨', 'Ventes aux enchères') + `<p>${esc(by.name)} choisit son lot…</p>`;
+        const cur = pd.bid ? pd.bid.cards.length + (pd.bid.bonus || 0) : 0, top = pd.bid ? byId(pd.bid.by) : null;
+        const canPre = me && pd.bid && pd.bid.by === me.id && me.hand.includes(E.PREUM) && !pd.bid.cards.includes(E.PREUM);
+        return head('🔨', 'Ventes aux enchères', `lot de ${esc(by.name)}`) + `<div class="lot">${pd.lot.map(c => findCard(c, { mini: true })).join('')}</div><p class="txi">${top ? `Meilleure offre : <b>${esc(top.name)}</b> — ${cur} trouvaille${cur > 1 ? 's' : ''}${pd.bid.bonus ? ` (dont +${pd.bid.bonus} Passe-droit)` : ''}` : "Aucune offre pour l'instant."}</p>` +
+          (isBy ? `<div class="txb">${btn('a-end', '🔨 Adjuger maintenant', true)}</div>` : `<div class="txb">${btn('a-bid', `💰 Enchérir (${txSel.length})`, txSel.length > cur, 'green')}${canPre ? btn('a-pre', '⏩ Passe-droit (+1)', true) : ''}</div><p class="txs">Sélectionne plus de ${cur} trouvaille${cur > 1 ? 's' : ''} dans ta main.</p>`);
+      }
+      case 'pot': {
+        const by = byId(pd.by), isBy = meId === pd.by;
+        if (pd.st === 'put') return isBy ? head('🍲', 'Pot commun', 'remplis le pot') + `<p>Sélectionne les trouvailles que tu mets dans le pot : les autres devront en mettre autant pour le rejoindre.</p><div class="txb">${btn('p-put', `🍲 Remplir le pot (${txSel.length})`, txSel.length >= 1, 'green')}${btn('cancel', 'Annuler', true, 'ghost')}</div>` : head('🍲', 'Pot commun') + `<p>${esc(by.name)} prépare le pot…</p>`;
+        if (pd.st === 'join') {
+          const inw = me && pd.wait.includes(me.id);
+          return head('🍲', 'Pot commun', `${pd.n} par joueur`) + `<div class="pot">${back(pd.pot.length)}</div><div class="who">${pd.parts.map(id => `<span class="ok">${nm(id)} ✅</span>`).join('')}${pd.wait.map(id => `<span>${nm(id)} …</span>`).join('')}</div>` +
+            (inw ? `<p>Mets <b>${pd.n}</b> trouvaille${pd.n > 1 ? 's' : ''} dans le pot pour le rejoindre.</p><div class="txb">${btn('p-join', `🍲 Rejoindre (${txSel.length}/${pd.n})`, txSel.length === pd.n, 'green')}${btn('p-no', 'Passer', true, 'ghost')}</div>` : '<p>En attente des autres joueurs…</p>');
+        }
+        const who = pd.order[pd.i % pd.order.length], my = meId === who;
+        return head('🍲', 'Pot commun', `au tour de ${nm(who)}`) + `<div class="pot open">${pd.pot.map((c, k) => `<div class="pc${my ? ' pick' : ''}" data-tx="p-take" data-ci="${k}">${findCard(c, { mini: true })}</div>`).join('')}</div><p>${my ? '👉 À toi : touche la trouvaille que tu veux !' : `${nm(who)} choisit…`}</p>`;
+      }
+    }
+    return '';
+  }
+  function txAct(el) {
+    const a = el.dataset.tx, ans = o => { Sfx.play('click'); txSel = []; App.act(Object.assign({ t: 'ans' }, o)); }, cards = txSel.slice();
+    switch (a) {
+      case 'cancel': return ans({ a: 'cancel' });
+      case 'm-offer': return ans({ a: 'offer', to: txTarget, cards });
+      case 'm-accept': return ans({ a: 'accept', cards });
+      case 'm-no': return ans({ a: 'no' });
+      case 'b-swap': return ans({ a: 'swap', cards });
+      case 'b-done': return ans({ a: 'done' });
+      case 'a-lot': case 'a-bid': case 'p-put': return ans({ cards });
+      case 'a-pre': return ans({ pre: 1 });
+      case 'a-end': return ans({ a: 'end' });
+      case 'p-join': return ans({ a: 'join', cards });
+      case 'p-no': return ans({ a: 'no' });
+      case 'p-take': return ans({ ci: +el.dataset.ci });
+    }
+  }
+
+  /* ---------- Main : trouvailles triées par type (le coin en haut à droite indique le type) ---------- */
+  function handHTML(me, tx) {
+    const hand = me.hand.slice();
+    let items;
+    if (tx) items = hand.map(c => ({ c, sel: txSel.includes(c) }));
+    else { const g = groupIng(hand), seen = new Set(); items = []; hand.forEach(c => { if (E.isIng(c)) { const k = E.ingOf(c); if (seen.has(k)) return; seen.add(k); items.push({ c: g[k][0], n: g[k].length, sel: sel && sel.ing === k }); } else items.push({ c, sel: sel && sel.id === c }); }); }
+    if (!items.length) return '<small style="opacity:.7">Main vide</small>';
+    return items.map((it, i) => findCard(it.c, { n: it.n, sel: it.sel, z: 60 - i })).join('');
+  }
   function detailHTML() {
     const S = App.S, me = seat(); if (!sel || !me) return '';
     if (sel.t === 'spell') {
       if (!me.spells.includes(sel.id)) return ''; const sp = spellOf(sel.id), c = E.canCast(S, me, sp);
-      return `<div class="detail"><div class="dh"><span class="e">${sp.emoji}</span><b>${esc(sp.name)}</b><span class="lvtag">${LV[sp.level]}</span></div><div class="dt">${esc(sp.effect)}</div><div class="di">${chips(sp, me.hand).replace(/<span class="(miss)?" title="([^"]*)">(.*?)<\/span>/g, (m, ms, t, e) => `<span class="${ms || ''}">${e} ${esc(t)}</span>`)}</div>
-        ${!c.ok ? `<div class="why">${esc(c.why)}</div>` : ''}<button class="btn ${c.ok && myTurn() ? '' : 'off'}" data-act="cast" data-sid="${sp.id}">🪄 Lancer</button></div>`;
+      return `<div class="detail"><button class="dx" data-act="closedet" title="Fermer">✕</button><div class="dcard">${fullSpell(sel.id, true)}</div><div class="dbody"><div class="dh"><b>${esc(sp.name)}</b><span class="lvtag">${LV[sp.level]}</span></div><div class="dt">${esc(sp.effect)}</div><div class="di">${chips(sp, me.hand).replace(/<span class="(miss)?" title="([^"]*)">(.*?)<\/span>/g, (m, ms, t, e) => `<span class="${ms || ''}">${e} ${esc(t)}</span>`)}</div>
+        ${!c.ok ? `<div class="why">${esc(c.why)}</div>` : ''}<button class="btn ${c.ok && myTurn() ? '' : 'off'}" data-act="cast" data-sid="${sp.id}">🪄 Lancer</button></div></div>`;
     }
     if (!me.hand.includes(sel.id) && sel.t === 'find' && !(sel.ing != null)) return '';
     if (sel.ing != null) {
       const g = D.ingredients[sel.ing], need = me.spells.filter(s => spellOf(s).ing.includes(sel.ing));
-      return `<div class="detail"><div class="dh"><span class="e">${g.emoji}</span><b>${esc(g.name)}</b><span class="lvtag">Ingrédient</span></div><div class="dt">Sert pour : ${need.length ? need.map(s => esc(spellOf(s).name)).join(', ') : 'aucun de tes sortilèges (monnaie d\'échange !)'}</div></div>`;
+      return `<div class="detail"><button class="dx" data-act="closedet" title="Fermer">✕</button><div class="dcard">${fullCard(sel.id, true)}</div><div class="dbody"><div class="dh"><b>${esc(g.name)}</b><span class="lvtag">Ingrédient</span></div><div class="dt">Sert pour : ${need.length ? need.map(s => esc(spellOf(s).name)).join(', ') : 'aucun de tes sortilèges (monnaie d\'échange !)'}</div></div></div>`;
     }
     const i = E.cardInfo(sel.id), noPlay = i.kind === 'obj' && E.NOPLAY.has(i.key);
-    return `<div class="detail"><div class="dh"><span class="e">${i.emoji}</span><b>${esc(i.name)}</b><span class="lvtag">${i.kind === 'obj' ? (i.useless ? 'Inutile' : 'Objet') : 'Transaction'}</span></div><div class="dt">${esc(i.effect)}</div>${noPlay ? '' : `<button class="btn ${myTurn() ? '' : 'off'}" data-act="play" data-cid="${sel.id}">▶️ Jouer</button>`}</div>`;
+    return `<div class="detail"><button class="dx" data-act="closedet" title="Fermer">✕</button><div class="dcard">${fullCard(sel.id, true)}</div><div class="dbody"><div class="dh"><b>${esc(i.name)}</b><span class="lvtag">${TYPE_LBL[typeOf(sel.id)]}</span></div><div class="dt">${esc(i.effect)}</div>${noPlay ? '' : `<button class="btn ${myTurn() ? '' : 'off'}" data-act="play" data-cid="${sel.id}">▶️ Jouer</button>`}</div></div>`;
   }
+  let sideTab = 'sorts';
   function renderTable() {
-    const S = App.S, me = seat(), T = $('#table'), cur = S.players[S.turn], mine = myTurn();
-    const spectator = !me, order = [];
-    if (me) { const i = S.players.indexOf(me); for (let k = 1; k < S.players.length; k++) order.push(S.players[(i + k) % S.players.length]); } else order.push(...S.players);
-    const pend = S.pend, last = S.log.slice(-4);
+    const S = App.S, me = seat(), T = $('#table'), cur = S.players[S.turn], mine = myTurn(), pend = S.pend, zoom = S.phase === 'play' && isTx(pend);
+    txSync(zoom ? pend : null);
+    const spectator = !me, n = S.players.length, ord = [];
+    if (me) { const i = S.players.indexOf(me); for (let k = 0; k < n; k++) ord.push(S.players[(i + k) % n]); } else ord.push(...S.players);
     const turnTxt = S.phase === 'end' ? '🏁 Partie terminée' : mine ? '🎯 À TOI DE JOUER !' : `${S.dir > 0 ? '↻' : '↺'} Tour de ${esc(cur.name)}${S.extra ? ' (+' + S.extra + ')' : ''}`;
-    const groups = me ? groupIng(me.hand) : {};
-    const finds = me ? me.hand.filter(c => !E.isIng(c)) : [];
-    const gk = Object.keys(groups).map(Number).sort((a, b) => a - b);
     const topD = S.discard.length ? findCard(S.discard[S.discard.length - 1], { mini: true }) : '<span class="em">🗑️</span>';
+    const piles = `<div class="tpiles"><div class="pile" data-act="deck"><span class="em">🂠</span><b>${S.deck.length}</b>pioche</div><div class="pile" data-act="disc">${topD}<small>défausse ${S.discard.length}</small></div></div>`;
+    const strip = [
+      spectator ? '<div class="banner">👀 Tu regardes la partie.</div>' : '',
+      pend && !zoom ? (pend.k === 'story' ? storyHTML(pend) : `<div class="banner ${pend.k === 'react' && me && pend.on === me.id ? 'alert' : ''}">${esc(pendText(pend))}</div>`) : '',
+      S.lum ? `<div class="banner">💡 Lumière : les trouvailles piochées / défaussées sont visibles.</div>` : '',
+      S.reveal ? `<div class="banner">🔔 Mains visibles jusqu'à la fin du tour de ${esc(byId(S.reveal).name)} !</div>` : '',
+      S.timer && cur.id === S.timer.pid ? `<div class="banner alert">⏳ ${esc(cur.name)} : <b id="timer-t">${Math.max(0, Math.round((S.timer.dl - Date.now()) / 1000))}</b> s</div>` : ''
+    ].join('');
     T.innerHTML = `
       <div class="hdr"><span class="room">🧪 ${esc(App.room)}</span><div class="turnb${mine ? ' me' : ''}">${turnTxt}</div>
         <button class="ibtn" data-act="snd">${Sfx.muted ? '🔇' : '🔊'}</button><button class="ibtn" data-act="rules">❓</button><button class="ibtn" data-act="cat">📖</button></div>
-      <div class="opps">${order.map(oppHTML).join('')}</div>
-      <div class="center">
-        <div class="pilecol"><div class="pile" data-act="deck"><span class="em">🂠</span><b>${S.deck.length}</b>pioche</div><div class="pile" data-act="disc">${topD}<small>défausse ${S.discard.length}</small></div></div>
-        <div class="mid">
-          ${spectator ? '<div class="banner">👀 Tu regardes la partie.</div>' : ''}
-          ${pend ? (pend.k === 'enchere' ? enchereHTML(pend) : pend.k === 'story' ? storyHTML(pend) : `<div class="banner ${pend.k === 'react' && me && pend.on === me.id ? 'alert' : ''}">${esc(pendText(pend))}</div>`) : ''}
-          ${S.lum ? `<div class="banner">💡 Lumière : les trouvailles de ${S.lum.n + 1 > 0 ? 'ces tours' : ''} sont visibles.</div>` : ''}
-          ${S.reveal ? `<div class="banner">🔔 Toutes les mains sont visibles jusqu'à la fin du tour de ${esc(byId(S.reveal).name)} !</div>` : ''}
-          ${S.timer && cur.id === S.timer.pid ? `<div class="banner alert">⏳ ${esc(cur.name)} : <b id="timer-t">${Math.max(0, Math.round((S.timer.dl - Date.now()) / 1000))}</b> s</div>` : ''}
-          ${gagesHTML()}
-          <div class="log" data-act="log">${last.map(l => `<div>${esc(l)}</div>`).join('')}</div>
-        </div></div>
-      ${me ? `<div class="mine"><div class="scroll">
-        <div><div class="row-lbl"><span>📜 Tes sortilèges (${E.spellSum(me)} ingr.)</span><span>${me.cast.map(s => spellOf(s).emoji).join(' ')} ${flagsOf(me)}</span></div>
-          <div class="spells">${me.spells.map(s => spellCard(s, { hand: me.hand, can: mine && E.canCast(S, me, spellOf(s)).ok, sel: sel && sel.t === 'spell' && sel.id === s })).join('') || '<small style="opacity:.7">Plus aucun sortilège !</small>'}</div></div>
-        <div><div class="row-lbl"><span>🃏 Tes trouvailles (${me.hand.length})</span></div>
-          <div class="hand">${gk.map(k => findCard(groups[k][0], { n: groups[k].length, sel: sel && sel.ing === k })).join('')}${finds.map(c => findCard(c, { sel: sel && sel.id === c })).join('')}${me.hand.length ? '' : '<small style="opacity:.7">Main vide</small>'}</div></div>
+      ${strip ? `<div class="strip">${strip}</div>` : ''}
+      <div class="board${zoom ? ' zoom' : ''}">
+        <div class="felt">${ord.map((p, i) => seatHTML(p, i, n, zoom)).join('')}
+          <div class="tcircle${zoom ? ' zoom' : ''}">${zoom ? `<div class="txbody">${txHTML(pend)}</div>${piles}` : `<div class="tl">TABLE DE JEU</div>${piles}`}</div></div>
+        <aside class="side" data-tab="${sideTab}">
+          <div class="tabs3"><button data-sidetab="rank">🏆 Classement</button><button data-sidetab="sorts">🎭 Sorts${S.gages.length ? ' (' + S.gages.length + ')' : ''}</button><button data-sidetab="hist">📜 Historique</button></div>
+          <section class="box rk"><h4>🏆 Classement <small>points et sorts restants</small></h4>${rankHTML()}</section>
+          <section class="box gg"><h4>🎭 Sorts en cours <small>⏱ 5 min</small></h4>${sortsHTML()}</section>
+          <section class="box hs" data-act="log"><h4>📜 Historique des coups</h4>${S.log.slice().reverse().map(l => `<div>${esc(l)}</div>`).join('')}</section>
+        </aside>
       </div>
-        ${detailHTML()}
+      ${me ? `<div class="mine${zoom ? ' zoom' : ''}"><div class="scroll">
+        <div class="sec hsec"><div class="row-lbl"><span class="lbl">🃏 TROUVAILLES (${me.hand.length})</span><span class="legend"><i class="corner ing"></i>ingrédient <i class="corner obj"></i>objet <i class="corner junk"></i>inutile <i class="corner tr"></i>transaction</span></div>
+          <div class="hand">${handHTML(me, zoom)}</div></div>
+        <div class="sec ssec"><div class="row-lbl"><span class="lbl">📜 SORTILÈGES (${me.spells.length}) · ⭐ ${E.spellSum(me)} pts</span><span>${me.cast.map(s => spellOf(s).emoji).join(' ')} ${flagsOf(me)}</span></div>
+          <div class="spells">${me.spells.map(s => spellCard(s, { hand: me.hand, can: mine && E.canCast(S, me, spellOf(s)).ok, sel: sel && sel.t === 'spell' && sel.id === s })).join('') || '<small style="opacity:.7">Plus aucun sortilège !</small>'}</div></div>
+      </div>
+        ${zoom ? '' : detailHTML()}
         <div class="bar"><button class="btn big grow ${mine ? '' : 'off'}" data-act="end">${mine ? '✅ Fin du tour' : '⏳ Patiente…'}</button><div class="emos">${['😂', '🔥', '💀', '👏'].map(e => `<button data-act="emo" data-e="${e}">${e}</button>`).join('')}</div></div></div>` : ''}`;
     attachTable(T);
   }
   function attachTable(T) {
     T.onclick = e => {
-      const S = App.S, me = seat(), el = e.target.closest('[data-act],[data-cid],[data-sid],.opp'); if (!el) return;
-      const act = el.dataset.act;
+      const S = App.S, me = seat(), el = e.target.closest('[data-act],[data-tx],[data-sidetab],[data-cid],[data-sid],[data-pid]'); if (!el) return;
+      const act = el.dataset.act, pd = S.pend, zoom = S.phase === 'play' && isTx(pd);
+      if (el.dataset.sidetab) { sideTab = el.dataset.sidetab; return renderTable(); }
+      if (el.dataset.tx) return txAct(el);
+      if (act === 'closedet') { sel = null; Sfx.play('click'); return renderTable(); }
       if (act === 'cast') return doCast(+el.dataset.sid);
       if (act === 'play') return doPlay(+el.dataset.cid);
       if (act === 'end') { Sfx.play('click'); sel = null; return App.act({ t: 'end' }); }
@@ -348,18 +481,29 @@
         if (el.dataset.all === '1') return pick({ title: '🚨 Qui est en faute ?', items: S.players.filter(p => p.id !== me.id).map(p => ({ id: p.id, html: avatar(p) + '<span>' + esc(p.name) + '</span>', cls: 'pplayer' })) }).then(r => r && App.act({ t: 'fault', gi, who: r[0] }));
         return App.act({ t: 'fault', gi });
       }
-      if (act === 'enchere') { const pd = S.pend; if (pd && pd.k === 'enchere' && me && pd.order[pd.i] === me.id) { Sfx.play('draw'); App.act({ t: 'ans', ci: +el.dataset.ci }); } return; }
-      if (act === 'preum') return App.act({ t: 'ans', pre: 1 });
       if (act === 'story') return App.act({ t: 'ans', ok: el.dataset.ok === '1' });
-      if (el.dataset.sid && !el.classList.contains('opp') && !act) {
+      if (el.dataset.sid && !act) {
         const sid = +el.dataset.sid; if (el.classList.contains('cb')) return showSpellInfo(sid);
         sel = { t: 'spell', id: sid }; Sfx.play('click'); return renderTable();
       }
       if (el.dataset.cid && !act) {
         const cid = +el.dataset.cid; Sfx.play('click');
+        if (zoom) { // pendant une transaction : on (dé)sélectionne les cartes de sa main
+          if (!me || !me.hand.includes(cid)) return;
+          const k = txSel.indexOf(cid); if (k >= 0) txSel.splice(k, 1); else { txSel.push(cid); while (txSel.length > txCap(pd)) txSel.shift(); }
+          return renderTable();
+        }
         sel = E.isIng(cid) ? { t: 'find', ing: E.ingOf(cid), id: cid } : { t: 'find', id: cid }; return renderTable();
       }
-      if (el.classList.contains('opp')) return showPlayerInfo(el.dataset.pid);
+      if (el.dataset.pid) {
+        if (zoom && pd.k === 'marche' && pd.st === 'offer' && me && pd.by === me.id && !el.classList.contains('rrow')) {
+          const t = byId(el.dataset.pid); if (!t || t === me || t.off) return;
+          if (t.lock) return toast(`${t.name} est protégé : impossible de lui échanger quoi que ce soit.`, 'err');
+          if (!t.hand.length) return toast(`${t.name} n'a plus de trouvaille.`, 'err');
+          txTarget = t.id; Sfx.play('click'); return renderTable();
+        }
+        return showPlayerInfo(el.dataset.pid);
+      }
     };
   }
 
@@ -392,7 +536,9 @@
       <li>🎭 <b>Gages :</b> la plupart des sorts de niveau 1 imposent un gage à un joueur. S'il oublie, <b>tu appuies sur 🚨 Faute</b> et tu lui prends une trouvaille au hasard !</li>
       <li>😬 <b>Quand un sort te vise :</b> tu peux subir, te racheter (2 trouvailles au lanceur), jouer le Creuset de Mikaël (annule) ou lancer « Celui qui dit qui est » (renvoie).</li>
       <li>🔒 Certains effets te protègent (Cadenat, Peignoir d'été, Bouclier noir, Protection, Mur de Vent).</li>
-      <li>🏪 <b>Transactions :</b> Jour de marché (tout le monde passe une carte à gauche), Brocante (défausse/repioche à volonté), Ventes aux enchères (on se sert dans des cartes retournées).</li>
+      <li>⏱ <b>Gages :</b> les sorts à effet continu durent <b>5 minutes</b>, puis prennent fin tout seuls (le chrono est dans « Sorts en cours »).</li>
+      <li>🏪 <b>Transactions</b> (sur la table) : <b>Jour de marché</b> (tu proposes un échange libre à un joueur), <b>Brocante</b> (2 trouvailles contre 1 de la pioche, à volonté), <b>Ventes aux enchères</b> (jusqu'à 3 trouvailles, on surenchérit en nombre de trouvailles, 30 s), <b>Pot commun</b> (chacun met autant que le lanceur, puis on se sert à tour de rôle).</li>
+      <li>🎨 Coin en haut à droite des cartes : jaune = ingrédient, bleu = objet, rouge = objet inutile, violet = transaction, orange = sortilège.</li>
       <li>🛠️ Touche une carte pour voir son effet, puis « Lancer » ou « Jouer ». Touche un joueur pour voir ses sorts lancés.</li></ul>
       <div class="foot"><button class="btn" data-x>Compris !</button></div></div>`);
     m.onclick = e => { if (e.target.closest('[data-x]') || e.target === m) closeModal(true); };
@@ -425,9 +571,11 @@
   function tickClock() { // compteurs vivants
     const S = App.S; if (!S) return;
     const t = $('#timer-t'); if (t && S.timer) t.textContent = Math.max(0, Math.round((S.timer.dl - Date.now()) / 1000));
+    $$('.cd[data-dl]').forEach(x => { x.textContent = Math.max(0, Math.round((+x.dataset.dl - Date.now()) / 1000)); });
+    $$('.tmr[data-exp]').forEach(x => { x.textContent = '⏱ ' + fmtT(+x.dataset.exp - Date.now()); });
     const st = $('#story-t'); if (st && S.pend && S.pend.k === 'story') { const l = Math.max(0, Math.round((S.pend.end - Date.now()) / 1000)); st.textContent = Math.floor(l / 60) + ':' + String(l % 60).padStart(2, '0'); }
   }
   setInterval(tickClock, 500);
 
-  Object.assign(App, { render, toast, show, showEnd, showRules, esc, avatar, closeModal, resetSel() { sel = null; }, cancelPrompt() { promptKey = ''; closeModal(true); }, centerOfPlayer(id) { return FX.centerOf($(`[data-pid="${CSS.escape(id)}"]`)); }, spellOf });
+  Object.assign(App, { render, toast, show, showEnd, showRules, esc, avatar, closeModal, fullCard, fullSpell, fullTr, resetSel() { sel = null; }, cancelPrompt() { promptKey = ''; closeModal(true); }, centerOfPlayer(id) { return FX.centerOf($(`[data-pid="${CSS.escape(id)}"]`)); }, spellOf });
 })();

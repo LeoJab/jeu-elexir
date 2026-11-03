@@ -352,7 +352,7 @@ window.DATA = {
    "key": "preum",
    "base": "Préum",
    "name": "Passe-droit",
-   "effect": "À jouer à tout moment : vous agissez en premier lors de la transaction en cours.",
+   "effect": "À jouer pendant une vente aux enchères, sur ta propre offre : elle compte pour une trouvaille de plus.",
    "emoji": "⏩"
   },
   {
@@ -1174,19 +1174,25 @@ window.DATA = {
    "key": "marche",
    "name": "Jour de marché",
    "emoji": "🏪",
-   "effect": "Chaque joueur choisit une trouvaille en secret : elles passent toutes au joueur de gauche."
+   "effect": "Propose d'échanger autant de trouvailles que tu veux contre autant de trouvailles d'un autre joueur (il peut refuser)."
   },
   {
    "key": "brocante",
    "name": "Brocante",
    "emoji": "🛒",
-   "effect": "Chacun défausse autant de trouvailles qu'il veut (même zéro) puis repioche autant."
+   "effect": "Chaque joueur peut défausser 2 trouvailles contre 1 de la pioche, autant de fois qu'il veut."
   },
   {
    "key": "encheres",
    "name": "Ventes aux enchères",
    "emoji": "🔨",
-   "effect": "On retourne autant de trouvailles que de joueurs : en commençant par celui qui a joué la carte, chacun en prend une."
+   "effect": "Mets jusqu'à 3 trouvailles aux enchères : les autres surenchérissent en nombre de trouvailles. Au bout de 30 secondes, le plus offrant remporte le lot et tes enchérisseurs te paient."
+  },
+  {
+   "key": "pot",
+   "name": "Pot commun",
+   "emoji": "🍲",
+   "effect": "Mets autant de trouvailles que tu veux dans le pot ; chaque joueur peut le rejoindre en mettant autant. Le pot est mélangé et visible, puis chacun prend une trouvaille à tour de rôle (en commençant par toi) jusqu'à vider le pot."
   }
  ]
 };

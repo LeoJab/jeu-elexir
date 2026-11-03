@@ -93,7 +93,7 @@
     App.render();
     const evs = S.fxq.filter(e => e.i > lastFx); lastFx = S.fxn;
     let delay = 0;
-    evs.forEach(e => { const d = e.k === 'cast' ? delay : 0; if (e.k === 'cast') delay += 1100; setTimeout(() => { try { playFx(e); } catch (err) { console.error(err); } }, d); });
+    evs.forEach(e => { const d = e.k === 'cast' || e.k === 'counter' ? delay : 0; if (e.k === 'cast') delay += 1100; setTimeout(() => { try { playFx(e); } catch (err) { console.error(err); } }, d); });
     if (S.phase === 'end' && !endShown[S.gid]) {
       endShown[S.gid] = 1; setTimeout(() => { if (App.S && App.S.phase === 'end') App.showEnd(); }, 1800);
       const me = App.S.players.find(p => p.id === App.me.id);
@@ -120,9 +120,23 @@
       case 'reverse': FX.floatText('↩️ Sens inversé !', innerWidth / 2, innerHeight / 2); FX.shake(false); Sfx.play('boom'); break;
       case 'skip': { const p = pos(e.id); FX.floatText('⏭️ Passe !', p.x, p.y); break; }
       case 'win': FX.confetti(220); FX.fireworks(8); Sfx.play('win'); break;
-      case 'obj': { const o = D.objects[e.cid - 64]; FX.burst(innerWidth / 2, innerHeight / 2, { n: 14, emoji: [o ? o.emoji : '✨', '✨'], speed: 260 }); Sfx.play('click'); break; }
+      case 'obj': { const o = D.objects[e.cid - 64]; FX.showCard(App.fullCard(e.cid), { by: `${nm(e.by)} joue ${App.esc(o ? o.name : '')}`, hold: 1500 }); FX.burst(innerWidth / 2, innerHeight * .42, { n: 14, emoji: [o ? o.emoji : '✨', '✨'], speed: 260 }); Sfx.play('cast2'); break; }
       case 'useless': FX.burst(innerWidth / 2, innerHeight / 2, { n: 8, emoji: ['🤷'], speed: 160 }); break;
-      case 'trans': App.toast(`${D.transactions[e.t].emoji} ${nm(e.by)} : ${D.transactions[e.t].name} !`, 'big'); Sfx.play('draw'); break;
+      case 'trans': { const t = D.transactions[e.t]; FX.showCard(App.fullTr(e.t), { by: `${nm(e.by)} ouvre ${App.esc(t.name)}`, hold: 1400 }); Sfx.play('draw'); break; }
+      case 'counter': {
+        const lbl = { cape: 'ANNULÉ !', buy: 'RACHETÉ !', mirror: 'RENVOYÉ !', shield: 'BLOQUÉ !' }[e.how] || 'CONTRÉ !';
+        FX.showCard(`<div style="position:relative">${App.fullSpell(e.sid)}<div class="stamp">${lbl}</div></div>`, { cls: 'counter', by: `${App.esc(nm(e.on))} contre « ${App.esc(D.spells[e.sid].name)} »`, hold: 1700 });
+        setTimeout(() => { FX.flash('#4ade80', 400); Sfx.play('shield'); }, 400); break;
+      }
+      case 'gageEnd': {
+        const sp = D.spells[e.sid], who = e.on === '*' ? 'tous' : nm(e.on);
+        FX.showCard(`<div style="position:relative">${App.fullSpell(e.sid)}<div class="stamp">⌛ FIN</div></div>`, { cls: 'end', by: `« ${App.esc(sp.name)} » prend fin (${App.esc(who)})`, hold: 1500 });
+        if (e.on !== '*') { const p = pos(e.on); FX.burst(p.x, p.y, { n: 16, emoji: ['✨', '⌛'], speed: 180 }); }
+        Sfx.play('fail'); break;
+      }
+      case 'swap': { const a = pos(e.a), b = pos(e.b); FX.burst(a.x, a.y, { n: 8, emoji: ['🃏'], speed: 200 }); FX.burst(b.x, b.y, { n: 8, emoji: ['🃏'], speed: 200 }); FX.floatText('⇄ ' + e.n, (a.x + b.x) / 2, (a.y + b.y) / 2); Sfx.play('draw'); break; }
+      case 'swap1': case 'draw1': { const p = pos(e.id); FX.burst(p.x, p.y, { n: 6, emoji: ['🃏'], speed: 140 }); Sfx.play('draw'); break; }
+      case 'bid': { const p = pos(e.id); FX.floatText('💰 ' + e.n, p.x, p.y, '#ffd426'); Sfx.play('click'); break; }
       case 'fault': { const p = pos(e.id); FX.floatText('🚨 FAUTE !', p.x, p.y, '#ff4d6d'); if (e.id === App.me.id) { FX.flash('#ff4d6d', 400); } Sfx.play('hit'); break; }
       case 'buy': { const a = pos(e.from); FX.burst(a.x, a.y, { n: 14, emoji: ['💸'], speed: 240 }); Sfx.play('draw'); break; }
       case 'cheer': { const p = pos(e.id); FX.burst(p.x, p.y, { n: 18, emoji: ['🎉', '👏'], speed: 260 }); break; }
