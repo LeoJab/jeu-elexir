@@ -346,8 +346,8 @@
           return head('🏪', 'Jour de marché', 'à toi de proposer') + `<p>Touche un joueur autour de la table, puis choisis dans ta main les trouvailles à lui proposer.</p><p class="txi">Échange avec : <b>${t ? esc(t.name) : '…'}</b> · ${txSel.length} carte${txSel.length > 1 ? 's' : ''}</p><div class="txb">${btn('m-offer', '🤝 Proposer', t && txSel.length >= 1 && txSel.length <= t.hand.length, 'green')}${btn('cancel', 'Annuler', true, 'ghost')}</div>`;
         }
         const t = byId(pd.to), k = pd.give.length;
-        return head('🏪', 'Jour de marché', `${esc(by.name)} ⇄ ${esc(t.name)}`) + `<div class="offer">${pd.give.map(c => findCard(c, { mini: true })).join('')}<span class="arr">⇄</span>${back(k)}</div>` +
-          (meId === pd.to ? `<p><b>${esc(by.name)}</b> te propose ${k} trouvaille${k > 1 ? 's' : ''} : choisis-en ${k} des tiennes en échange.</p><div class="txb">${btn('m-accept', '✅ Accepter', txSel.length === k, 'green')}${btn('m-no', '🙅 Refuser', true, 'red')}</div>` : `<p>${esc(by.name)} propose un échange à <b>${esc(t.name)}</b>…</p>`);
+        return head('🏪', 'Jour de marché', `${esc(by.name)} ⇄ ${esc(t.name)}`) + `<div class="offer">${meId === pd.by ? pd.give.map(c => findCard(c, { mini: true })).join('') : back(k)}<span class="arr">⇄</span>${back(k)}</div>` +
+          (meId === pd.to ? `<p><b>${esc(by.name)}</b> te propose ${k} trouvaille${k > 1 ? 's' : ''} (cachée${k > 1 ? 's' : ''}) : choisis-en ${k} des tiennes en échange.</p><div class="txb">${btn('m-accept', '✅ Accepter', txSel.length === k, 'green')}${btn('m-no', '🙅 Refuser', true, 'red')}</div>` : `<p>${esc(by.name)} propose un échange à <b>${esc(t.name)}</b>…</p>`);
       }
       case 'brocante': {
         const inw = me && pd.wait.includes(me.id);

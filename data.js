@@ -486,7 +486,7 @@ window.DATA = {
    "ing": [
     14
    ],
-   "effect": "Le lanceur peut changer de place avec quelqu’un",
+   "effect": "Le lanceur choisit un joueur et échange sa place avec lui dans l'ordre des tours.",
    "emoji": "🪑"
   },
   {

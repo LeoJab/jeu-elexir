@@ -33,7 +33,7 @@
   const GAGE = { need: ['player'], hostile: 1, mode: 'gage' }, ONCE = { need: ['player'], hostile: 1, mode: 'once' };
   const HIT = { need: ['player'], hostile: 1 }, STEAL = { need: ['player'], hostile: 1, steal: 1 }, NONE = { need: [] };
   const META = {
-    poil: GAGE, saper: GAGE, croa: GAGE, autaf: ONCE, bougeotte: ONCE, lechebottes: GAGE, rimaille: GAGE, perplexe: HIT,
+    poil: GAGE, saper: GAGE, croa: GAGE, autaf: ONCE, bougeotte: { need: ['player'] }, lechebottes: GAGE, rimaille: GAGE, perplexe: HIT,
     septvoiles: ONCE, pinson: GAGE, grrrh: GAGE, cabriole: ONCE, jolicoeur: GAGE, langue: ONCE, echo: GAGE, muet: GAGE,
     transfert: { need: ['gage', 'player'], hostile: 1 }, annulation: NONE, ressort: NONE, tournesort: NONE, braquage: STEAL,
     lumiere: NONE, affaires: NONE, generosite: NONE, beurk: { need: ['player', 'ing'], hostile: 1, steal: 1 }, abracada: NONE,
@@ -239,6 +239,10 @@
       return;
     }
     switch (sp.key) {
+      case 'bougeotte': {
+        const i = S.players.indexOf(c), j = S.players.indexOf(t); [S.players[i], S.players[j]] = [S.players[j], S.players[i]]; S.turn = j;
+        log(`🧳 ${c.name} échange sa place avec ${t.name} dans l'ordre des tours !`); fx('boom'); break;
+      }
       case 'perplexe': t.skip = 1; log(`⏭️ ${t.name} passera son prochain tour.`); break;
       case 'transfert': { const g = S.gages.find(g => g.i === prm.gi); if (!g || g.on !== c.id) { log('Aucun gage à transférer.'); break; } g.on = t.id; log(`↪️ ${c.name} refile « ${D.spells[g.sid].name} » à ${t.name} !`); break; }
       case 'annulation': c.shield = 1; log(`🛡️ ${c.name} est protégé contre le prochain sort de niveau 1 ou 2.`); break;

@@ -67,10 +67,10 @@ Les joueurs protégés apparaissent grisés dans la liste des cibles.
 7. LES GAGES (sorts de niveau 1 et quelques autres)
 ===================================================
 La plupart des sorts de niveau 1 imposent un GAGE à un joueur : une contrainte à respecter (finir ses phrases par un bruit, parler en rimes, appeler le lanceur « Maître »...). Le gage reste actif jusqu'à ce qu'il soit levé.
-• DURÉE : un gage (sort à effet continu) dure 5 MINUTES. Le chrono est affiché dans « Sorts en cours » ; au bout de 5 min, le gage prend fin tout seul (animation « FIN »). Les missions ponctuelles (Vérité ou Vérité, Pied, Suceur, FDP, Nomade) n'ont pas de chrono : le lanceur appuie sur « Fait ».
+• DURÉE : un gage (sort à effet continu) dure 5 MINUTES. Le chrono est affiché dans « Sorts en cours » ; au bout de 5 min, le gage prend fin tout seul (animation « FIN »). Les missions ponctuelles (Vérité ou Vérité, Pied, Suceur, FDP) n'ont pas de chrono : le lanceur appuie sur « Fait ».
 • LA FAUTE : si le joueur gagé oublie son gage, le LANCEUR du gage appuie sur « 🚨 Faute » et lui prend une trouvaille au hasard. C'est à l'honneur et à la vigilance de chacun !
 • Les gages affichés en rouge sont ceux qui te concernent.
-• Les « missions » (Vérité ou Vérité, Pied, Suceur, FDP, Nomade) sont des gages ponctuels : le lanceur appuie sur « ✔ Fait » quand c'est accompli.
+• Les « missions » (Vérité ou Vérité, Pied, Suceur, FDP) sont des gages ponctuels : le lanceur appuie sur « ✔ Fait » quand c'est accompli.
 • Le gage « Muet » prend fin au début du prochain tour de sa victime.
 • Le sort « Votre » (niveau 2) est un gage sur TOUT LE MONDE : chacun doit vouvoyer et appeler le lanceur « Votre Excellence ». Le lanceur désigne le fautif.
 • Comment lever un gage : sort « Ressort » (tous les gages), objet « Purge » (un gage de niveau 1 sur toi), sort « Transfert » (le refiler à quelqu'un), ou le renvoyer avec un Miroir.
@@ -78,7 +78,7 @@ La plupart des sorts de niveau 1 imposent un GAGE à un joueur : une contrainte 
 8. LES TRANSACTIONS
 ===================
 Une transaction se joue pendant ton tour comme n'importe quelle carte. Au moment où elle est jouée, la TABLE DE JEU s'agrandit : la transaction se déroule sur la table (cartes au centre), et tu sélectionnes tes cartes dans ta main puis tu valides avec les boutons de la table.
-• JOUR DE MARCHÉ : le lanceur propose d'échanger autant de trouvailles qu'il veut contre autant de trouvailles d'un autre joueur. Il touche le joueur visé, sélectionne les cartes qu'il propose (elles sont montrées sur la table), puis le joueur visé choisit ACCEPTER (il donne en échange le même nombre de trouvailles de son choix) ou REFUSER. Un joueur protégé par un Cadenat/Peignoir ne peut pas être visé.
+• JOUR DE MARCHÉ : le lanceur propose d'échanger autant de trouvailles qu'il veut contre autant de trouvailles d'un autre joueur. Il touche le joueur visé, sélectionne les cartes qu'il propose (elles restent cachées : l'autre joueur ne voit que leur nombre), puis le joueur visé choisit ACCEPTER (sans voir ce qu'on lui offre ; il donne en échange le même nombre de trouvailles de son choix) ou REFUSER. Un joueur protégé par un Cadenat/Peignoir ne peut pas être visé.
 • BROCANTE : chaque joueur est libre de défausser 2 trouvailles contre 1 de la pioche, autant de fois qu'il le veut (ça se passe en même temps pour tout le monde). Chacun clique sur « J'ai fini » quand il a terminé ; la brocante se termine quand tous ont fini ou au bout de 60 secondes.
 • VENTES AUX ENCHÈRES : le lanceur met aux enchères jusqu'à 3 trouvailles (le lot est visible sur la table). Les autres joueurs surenchérissent en NOMBRE de trouvailles (il faut toujours offrir plus que la meilleure offre en cours ; on choisit les cartes offertes). Au bout de 30 secondes (ou si le lanceur clique sur « Adjuger maintenant »), les enchères prennent fin : le plus offrant remporte le lot et donne ses trouvailles offertes au lanceur. Sans offre, le lanceur garde son lot. L'objet « Passe-droit » se joue sur sa propre offre : elle compte pour une trouvaille de plus.
 • POT COMMUN : le lanceur choisit combien de trouvailles il met dans le pot (au moins 1). Chacun des autres joueurs peut alors décider de rejoindre le pot en y mettant autant de trouvailles que le lanceur (ou de passer). Ensuite, le pot est mélangé et les trouvailles sont visibles : chacun leur tour, les joueurs qui ont participé choisissent la trouvaille qu'ils veulent, en commençant par le lanceur, jusqu'à vider le pot. Si personne ne rejoint, le lanceur récupère ses cartes.
@@ -119,7 +119,8 @@ Chaque victoire est enregistrée dans le classement « all time » du hub (victo
 • CLASSEMENT : liste des joueurs avec points et sorts restants (le premier est celui à qui il reste le moins de points).
 • SORTS EN COURS : liste des gages actifs avec leur chrono de 5 minutes, et les boutons Faute / Fait pour le lanceur.
 • HISTORIQUE DES COUPS : tout ce qui s'est passé.
-• ANIMATIONS : une carte est montrée à l'écran quand un sort est lancé, quand il est contré (Creuset, Miroir, rachat, protection), quand il prend fin, et quand un objet ou une transaction est joué.
+• NOMADE (sort) : le lanceur choisit un joueur et échange sa place avec lui dans l'ordre des tours.
+• ANIMATIONS : les cartes jouées restent affichées jusqu'à ce qu'on touche pour les fermer. Une carte est montrée à l'écran quand un sort est lancé, quand il est contré (Creuset, Miroir, rachat, protection), quand il prend fin, et quand un objet ou une transaction est joué.
 
 ANNEXE A — LISTE DES SORTILÈGES
 ===============================
@@ -135,7 +136,7 @@ Niveau 1  (★)
 • Vérité ou Vérité  [Pointe de ragebait]
     La cible doit répondre honnêtement à une question du lanceur
 • Nomade  [Caca de type 7]
-    Le lanceur peut changer de place avec quelqu’un
+    Le lanceur choisit un joueur et échange sa place avec lui dans l'ordre des tours.
 • Lèche-cul  [Cheveux blancs]
     La cible doit appeler le lanceur « Maître » et lui répondre « Oui mon seigneur » ⏱ Dure 5 min.
 • Rimaille  [Herbe à fumer]

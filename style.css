@@ -246,7 +246,7 @@ label { display: flex; flex-direction: column; gap: 4px; text-align: left; font-
 .offer .arr { font-size: 26px; }
 .who { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; font-size: 12px; } .who span { background: rgba(255,255,255,.5); border-radius: 8px; padding: 0 6px; } .who span.ok { background: var(--green); }
 .board.zoom .side { display: none; } .board.zoom .felt { min-height: 280px; }
-.mine.zoom .ssec { display: none; }
+
 
 /* Panneaux latéraux : classement, sorts en cours, historique */
 .side { flex: none; height: 108px; display: flex; flex-direction: column; gap: 4px; min-height: 0; }
@@ -284,7 +284,7 @@ label { display: flex; flex-direction: column; gap: 4px; text-align: left; font-
 .fcard.compact .fn { font-size: 12px; padding-right: 16px; } .fcard.compact .fi { font-size: 34px; border-width: 2px; } .fcard.compact .corner { width: 20px; height: 20px; line-height: 16px; font-size: 12px; border-width: 2px; } .fcard.compact .fing span { font-size: 14px; }
 
 /* Cartes montrées à l'écran (objet joué, sort contré, fin de gage, transaction) */
-.cardfly { position: fixed; left: 50%; top: 42%; z-index: 84; pointer-events: none; transform: translate(-50%, -50%); animation: cfIn .5s cubic-bezier(.2, 1.6, .4, 1); transition: transform .6s ease-in, opacity .6s; text-align: center; }
+.cardfly { position: fixed; left: 50%; top: 42%; z-index: 84; pointer-events: auto; cursor: pointer; transform: translate(-50%, -50%); animation: cfIn .5s cubic-bezier(.2, 1.6, .4, 1); transition: transform .6s ease-in, opacity .6s; text-align: center; }
 @keyframes cfIn { from { transform: translate(-50%, -50%) scale(.15) rotate(-20deg); opacity: 0; } }
 .cardfly .cf-by { margin-top: 10px; display: inline-block; background: var(--ink); color: #fff; border: 3px solid var(--yellow); border-radius: 10px; padding: 3px 10px; font-weight: 900; }
 .cardfly .fcard { margin: 0 auto; box-shadow: 0 0 0 4px var(--fc), 0 0 36px var(--fc), 6px 6px 0 var(--ink); }
@@ -351,4 +351,41 @@ label { display: flex; flex-direction: column; gap: 4px; text-align: left; font-
 @media (max-width: 899px) {
   .felt { aspect-ratio: auto; flex: 1; min-height: 250px; width: 100%; }
   .board { overflow: hidden; } .side { height: 92px; } .mine { max-height: 40dvh; }
+}
+
+/* ---- Retouches 2 : sorts toujours visibles, plus de barre de défilement parasite ---- */
+.cf-hint { margin-top: 8px; font-size: 12px; opacity: .85; font-weight: 800; color: #fff; text-shadow: 1px 1px 0 var(--ink); }
+.cine-card .cf-hint { color: var(--ink); text-shadow: none; opacity: .6; }
+.hand, .spells { padding: 12px 8px 10px; }
+.box { overflow-x: hidden; }
+.srow.onme { animation: blinkRed 1.6s infinite; }
+@keyframes blinkRed { 50% { filter: brightness(1.35); } }
+.spell.can { animation: none; outline: 3px solid var(--yellow); outline-offset: -1px; }
+.mine .scroll { overflow-x: hidden; }
+.mine .hsec { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+.mine .ssec { flex: none; }
+@media (max-width: 899px) {
+  .mine .scroll { overflow-y: hidden; }
+  .ssec .spells { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; padding-bottom: 6px; } .ssec .spells::-webkit-scrollbar { display: none; }
+  .hsec { max-height: 150px; }
+}
+.cine { pointer-events: none; } .cine-card { pointer-events: auto; cursor: pointer; }
+#modal { z-index: 87; }
+@media (max-width: 899px) { .tcircle.zoom .tpiles { display: none; } .txbody { padding-bottom: 6px; } }
+@media (max-width: 899px) {
+  .board.zoom .felt { min-height: 235px; }
+  .mine.zoom { max-height: 54dvh; } .mine.zoom .hsec { max-height: none; min-height: 120px; }
+  .mine.zoom .spell { min-height: 46px; width: 84px; } .mine.zoom .spell .em, .mine.zoom .spell .ings { display: none; } .mine.zoom .ssec .spells { padding-top: 8px; }
+}
+@media (max-width: 899px) {
+  .mine .scroll { overflow-y: auto; }
+  .mine .hsec, .mine.zoom .hsec { flex: none; max-height: none; min-height: 100px; overflow: visible; }
+  .mine { max-height: 47dvh; } .mine.zoom { max-height: 40dvh; }
+  .felt { min-height: 200px; } .board.zoom .felt { min-height: 275px; }
+}
+@media (max-width: 899px) {
+  .mine .scroll { overflow: hidden; display: flex; flex-direction: column; }
+  .mine .hsec, .mine.zoom .hsec { flex: 1 1 auto; min-height: 100px; overflow-y: auto; }
+  .mine .ssec { flex: none; }
+  .detail { max-height: 26dvh; overflow-y: auto; }
 }

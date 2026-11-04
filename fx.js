@@ -121,9 +121,9 @@
   function cinematic(o) { // { sp, by, on, esc }
     const sp = o.sp, lv = LV[sp.level], el = document.createElement('div');
     el.className = 'cine lv' + sp.level; el.style.setProperty('--lc', lv.c);
-    el.innerHTML = '<div class="cine-rays"></div><div class="cine-card"><div class="cine-lvl">' + '★'.repeat(sp.level) + '</div><div class="cine-emoji">' + sp.emoji + '</div><div class="cine-name">' + o.esc(sp.name) + '</div><div class="cine-who">' + o.esc(o.by) + (o.on ? ' <b>➜</b> ' + o.esc(o.on) : '') + '</div><div class="cine-txt">' + o.esc(sp.effect) + '</div></div>';
+    el.innerHTML = '<div class="cine-rays"></div><div class="cine-card"><div class="cine-lvl">' + '★'.repeat(sp.level) + '</div><div class="cine-emoji">' + sp.emoji + '</div><div class="cine-name">' + o.esc(sp.name) + '</div><div class="cine-who">' + o.esc(o.by) + (o.on ? ' <b>➜</b> ' + o.esc(o.on) : '') + '</div><div class="cine-txt">' + o.esc(sp.effect) + '</div><div class="cf-hint" style="margin-top:8px">✕ Touche pour fermer</div></div>';
     document.body.appendChild(el);
-    const life = sp.level === 4 ? 3000 : sp.level === 3 ? 2300 : sp.level === 2 ? 1800 : 1500;
+    const life = 30000; // reste affiché jusqu'au clic
     const kill = () => { el.classList.add('out'); setTimeout(() => el.remove(), 300); };
     el.addEventListener('click', kill); setTimeout(kill, life);
     Sfx.play('cast' + sp.level);
@@ -134,16 +134,20 @@
     if (sp.level === 4) { burst(x, y, { n: 90, emoji: [sp.emoji, '🔥', '⚡', '✨'], speed: 500 }); bolt('#fff', 6); flash('#fff', 700); shake(true); setTimeout(() => burst(x, y, { n: 60, colors: [lv.c, '#ff4d6d'], speed: 450 }), 500); }
   }
 
-  /* Montre une carte au centre de l'écran, puis l'envoie vers la défausse. */
+  /* Montre une carte au centre de l'écran jusqu'à ce qu'on la touche, puis l'envoie vers la défausse. */
+  let cardN = 0;
   function showCard(html, o) {
-    o = o || {}; const el = document.createElement('div'); el.className = 'cardfly ' + (o.cls || ''); el.innerHTML = html + (o.by ? '<div class="cf-by">' + o.by + '</div>' : '');
-    document.body.appendChild(el); const hold = o.hold || 1300;
-    setTimeout(() => {
+    o = o || {}; const el = document.createElement('div'); el.className = 'cardfly ' + (o.cls || ''); const k = cardN++ % 4;
+    el.style.marginLeft = (k * 18) + 'px'; el.style.marginTop = (k * 14) + 'px'; el.style.zIndex = 84 + k;
+    el.innerHTML = html + (o.by ? '<div class="cf-by">' + o.by + '</div>' : '') + '<div class="cf-hint">✕ Touche pour fermer</div>';
+    document.body.appendChild(el); let gone = false;
+    const bye = () => {
+      if (gone) return; gone = true;
       const d = document.querySelector('[data-act="disc"]'), r = el.getBoundingClientRect();
       if (d) { const t = d.getBoundingClientRect(); el.style.transform = 'translate(-50%,-50%) translate(' + (t.left + t.width / 2 - (r.left + r.width / 2)) + 'px,' + (t.top + t.height / 2 - (r.top + r.height / 2)) + 'px) scale(.15) rotate(25deg)'; }
-      el.style.opacity = '0';
-    }, hold);
-    setTimeout(() => el.remove(), hold + 700);
+      el.style.opacity = '0'; setTimeout(() => el.remove(), 700);
+    };
+    el.addEventListener('click', bye); setTimeout(bye, 30000);
   }
 
   root.FX = { showCard, burst, confetti, fireworks, bolt, flash, shake, floatText, centerOf, cinematic, W: () => W, H: () => H };
